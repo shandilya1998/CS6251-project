@@ -3,13 +3,9 @@ import wiktextract
 import sys
 import ijson
 
-
-
-
 fh = open("output.json", "w")
 def word_cb(data):
-    json.dump(data,fh)
-    
+    json.dump(data,fh)    
     
 ctx = wiktextract.parse_wiktionary(
     "enwiktionary-latest-pages-articles.xml", word_cb,
