@@ -1,165 +1,144 @@
 import pandas as pd
-from raw_data import data # data is the object of class Data, which loads wordlist.csv into a DataFrame
+#from raw_data import data # data is the object of class Data, which loads wordlist.csv into a DataFrame
 import os
 import matplotlib.pyplot as plt
 import copy 
-from raw_data import unique_word_keys_file, unique_words_def_file
+import pickle
+#from raw_data import unique_word_keys_file, unique_words_def_file
+import ast
 
-class graph_v1():
-    def __init__(self):
-        self.data = data.sample
-        # self.unique_word_keys is a tuple with two elements - (list of words, number of words)
-        self.unique_words_keys = self.open_pickle_file(unique_word_keys_file)
-        # self.unique_words_def_freq is a tuple with two elements - (list of words&freq, number of words)
-        self.unique_words_def_freq = self.open_pickle_file(unique_words_def_file)
-
-    def split(self, data):
-        data[1] = data[1].apply(str.split, ' ')
-        return data
-
-    def open_pickle_file(self, file):
-        pkl = open(file, 'rb')
-        data = pickle.load(pkl)
-        pickle.close()
-        return data
    
-   def create_adjacency_matrix(self):
-       self.ob_ajncy_m = adjacency_matrix(self.data, len(self.intersection))
-       self.adjacency_matrix, self.unique_words = self.ob_adjncy_m.construct()
 
-   def intersection(self):
-       unique_words = np.intersect1d(self.unique_words_def_freq, unique_words, keys)
-       return unique_words
-
-   def create_adjacency_list(self):
-       def.ob_adjcncy_lst = adjacency_list(self.data, len(self.intersection))
-
-class adjacency_matrix():
-    def __init__(self, data, size, unique_words):
-        self.data = data
-        self.unique_words = unique_words
-        self.adjacency_matrix = np.zeros((size, size))
-
-    def print_adjncy_matrix(self):
-        print(self.adjacency_matrix)
-
-    def construct(self):
-        self.wordlist = np.array(())
-        for i in range(len(sample)):
-            if sample[i, 0] not in self.wordlist:
-                self.wordlist = np.append(self.wordlist, np.array([sample[i, 0]]))
-            for j in range(len(sample[i, 1])):
-                if sample[i,1][j] in self.wordlist:
-                    self.adjacency_matrix[self.index_wordlist(sample[i, 0]),self.index_wordlist(sample[i, 1][j])]+=1
-                else:
-                    self.wordlist = np.append(self.wordlist, np.array([sample[i, 1][j]]))
-                    self.adjacency_matrix[self.index_wordlist(sample[i, 0]), len(wordlist)-1]+=1
-        return self.adjacency_matrix, self.wordlist
-
-    def index_wordlist(self, word):
-        return list(self.wordlist).index(word)
-
-class adjacency_list():
-    def __init__(self, data, size, unique_words):
-        self.data = data
-        self.unique_words = unique_words
-        self.adjacency_list = np.zeros((size, 2))
-
-    def print_adjncy_matrix(self):
-        print(self.adjacency_list)
-
-    def construct(self):
-        self.wordlist = np.array(())
-        for i in range(len(sample)):
-            if wordlist = np.append(self.wordlist, np.array([sample[i, 0]])):
-                self.wordlist = np.append(self.wordlist, np.array([sample[i, 0]]))
-            for j in range(len(sample[i, 1])):
-                if sample[i,1][j] in self.wordlist:
-                    self.adjacency_list[self.index_wordlist(sample[i, 0]), 1].append(j)
-                else:
-                    self.wordlist = np.append(self.wordlist, np.array([sample[i, 1][j]]))
-                    self.adjacency_list[self.index_wordlist(sample[i, 0]), 1].append(j)  
-        return self.adjacency_list, self.wordlist
-
-    def index_wordlist(self, word):
-        return list(self.wordlist).index(word)
-
-class Relationship():
+path = 'wordlist_tokenized.csv'
+df = pd.read_csv(path)
+df = df.iloc[:, [0,2]]
+# Import combined wordlist
+path = 'combined_wordlist.pickle'
+pkl = open(path, 'rb')
+df2 = pickle.load(pkl)
+pkl.close()
+class graph():
     def __init__(self, data):
+        """
+            This class contains all methods required to create a graph from a csv with w 
+            and corresponding def(w)
+            The class object requires the path to the csv file as an input during initialization
+        """
         self.data = data
+        #self.combine_polysemous_definitions()
+        #self.word = input('input word to evolve dictionary network for: ')
+        #self.network = self.evolve_graph(self.word)
+        self.graph = pd.DataFrame(columns = [0,1])
+        
+    def combine_polysemous_definitions(self):
+        unique_keys = pd.Series(self.data.iloc[:, 0].unique())
+        definitions = self.logged_apply(unique_keys, self.concat_definition)
+        self.data = pd.concat([unique_keys, definitions], axis = 1)
+        #print(self.data)
+        pkl = 'combined_wordlist.pickle'
+        pkl = open(pkl, 'wb')
+        pickle.dump(self.data, pkl)
+        pkl.close()
 
-    """
-        A recursive function that find finds and prints strongly connected 
-        components using DFS traversal u --> v.
-        The vertex to be visited next:
-        disc[] --> Stores discovery times of visited vertices 
-        low[] --> earliest visited vertex (the vertex with minimum
-                    discovery time) that can be reached from subtree
-                    rooted with current vertex
-        st --> To store all the connected ancestors (could be part
-                 of SCC)
-        stackMember[] --> bit/index array for faster check whether 
-                          a node is in stack
-    """
-    def SCCUtil(self,u, low, disc, stackMember, st):
+    def concat_definition(self, key):
+        data = self.data[self.data.iloc[:,0] == key]
+        definitions = data.iloc[:,1]
+        definition = []
+        for df in definitions:
+            #print(df)
+            definition.append(df)
+            #print(type(df))
+            #print(definition)
+        #print(definition)
+        return definition
 
-        # Initialize discovery time and low value
-        disc[u] = self.Time
-        low[u] = self.Time
-        self.Time += 1
-        stackMember[u] = True
-        st.append(u)
+    def construct_graph(self):
+        for w in self.data.iloc[:, 0],values:
+            self.add_vertex(w)
+            def_w =  self.data[self.data[0] == w][1].iloc[0]
+            for df in def_w:
+                df = ast.literal_eval(df)
+                for w_ in df:
+                    self.add_edge(w, w_)
 
-        # Go through all vertices adjacent to this
-        for v in self.graph[u]:
+    def vertices(self):
+        """ 
+            returns the vertices of a graph 
+        """
+        return list(self.graph.iloc[:,0].values)
 
-            # If v is not visited yet, then recur for it
-            if disc[v] == -1 :
+    def edges(self):
+        """ 
+            returns the edges of a graph 
+        """
+        return self.__generate_edges()
 
-                self.SCCUtil(v, low, disc, stackMember, st)
+    def add_vertex(self, word):
+        """ 
+            If the word "word" is not in
+            self.graph, a key "word" with an empty
+            list as a value is added to the dictionary.
+            Otherwise nothing has to be done.
+        """
+        if vertex not in self.graph.iloc[:,0].values:
+            self.graph = self.graph.append(pd.DataFrame([[word, []]]), ignore_index = True)
 
-                # Check if the subtree rooted with v has a connection to
-                # one of the ancestors of u
-                # Case 1 (per above discussion on Disc and Low value)
-                low[u] = min(low[u], low[v])
+    def add_edge(self, edge):
+        """ 
+            assumes that edge is of type set, tuple or list;
+            between two vertices can be multiple edges!
+        """
+        edge = set(edge)
+        (w, def_w) = tuple(edge)
+        self.add_vertex(def_w)
+        if w in self.graph.iloc[:,0].values:
+            self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
+        else:
+            self.add_vertex(w)
+            self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
 
-            elif stackMember[v] == True:
+    def __generate_edges(self):
+        """ 
+            A static method generating the edges of the
+            graph "graph". Edges are represented as sets
+            with one (a loop back to the vertex) or two
+            vertices
+        """
+        edges = []
+        for vertex in self.graph.iloc[:,0].values:
+            for neighbour in self.graph[self.graph[0] == vertex][1].iloc[0]:
+                if {neighbour, vertex} not in edges:
+                    edges.append({vertex, neighbour})
+        return edges
 
-                '''Update low value of 'u' only if 'v' is still in stack
-                (i.e. it's a back edge, not cross edge).
-                Case 2 (per above discussion on Disc and Low value) '''
-                low[u] = min(low[u], disc[v])
+    def logged_apply(self, g, func, *args, **kwargs):
+        """
+            g - dataframe
+            func - function to apply to the dataframe
+            *args, **kwargs are the arguments to func
+            The method applies the function to all the elements of the dataframe and shows progress
+        """
+        step_percentage = 100. / len(g)
+        import sys
+        sys.stdout.write('apply progress:   0%')
+        sys.stdout.flush()
 
-        # head node found, pop the stack and print an SCC
-        w = -1 #To store stack extracted vertices
-        if low[u] == disc[u]:
-            while w != u:
-                w = st.pop()
-                print w,
-                stackMember[w] = False
+        def logging_decorator(func):
+            def wrapper(*args, **kwargs):
+                progress = wrapper.count * step_percentage
+                sys.stdout.write('\033[D \033[D' * 4 + format(progress, '3.0f') + '%')
+                sys.stdout.flush()
+                wrapper.count += 1
+                return func(*args, **kwargs)
+            wrapper.count = 0
+            return wrapper
 
-            print""
+        logged_func = logging_decorator(func)
+        res = g.apply(logged_func, *args, **kwargs)
+        sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
+        sys.stdout.flush()
+        return res
 
-
-
-    #The function to do DFS traversal.
-    # It uses recursive SCCUtil()
-    def SCC(self):
-
-        # Mark all the vertices as not visited
-        # and Initialize parent and visited,
-        # and ap(articulation point) arrays
-        disc = [-1] * (self.V)
-        low = [-1] * (self.V)
-        stackMember = [False] * (self.V)
-        st =[]
-
-
-        # Call the recursive helper function
-        # to find articulation points
-        # in DFS tree rooted with vertex 'i'
-        for i in range(self.V):
-            if disc[i] == -1:
-                self.SCCUtil(i, low, disc, stackMember, st)
-
-
+#ob =  graph(df)
+graph = graph(df2)
+graph = graph.construct_graph()
