@@ -6,7 +6,7 @@ import copy
 import pickle
 #from raw_data import unique_word_keys_file, unique_words_def_file
 import ast
-
+from tqdm import tqdm
    
 
 path = 'wordlist_tokenized.csv'
@@ -53,13 +53,14 @@ class graph():
         return definition
 
     def construct_graph(self):
-        for w in self.data.iloc[:, 0],values:
+        for w in tqdm(self.data.iloc[:, 0].values):
             self.add_vertex(w)
             def_w =  self.data[self.data[0] == w][1].iloc[0]
             for df in def_w:
                 df = ast.literal_eval(df)
                 for w_ in df:
-                    self.add_edge(w, w_)
+                    self.add_edge((w, w_))
+        return self.graph
 
     def vertices(self):
         """ 
@@ -73,26 +74,27 @@ class graph():
         """
         return self.__generate_edges()
 
-    def add_vertex(self, word):
+    def add_vertex(self, w):
         """ 
             If the word "word" is not in
             self.graph, a key "word" with an empty
             list as a value is added to the dictionary.
             Otherwise nothing has to be done.
         """
-        if vertex not in self.graph.iloc[:,0].values:
-            self.graph = self.graph.append(pd.DataFrame([[word, []]]), ignore_index = True)
+        if w not in self.graph.iloc[:,0].values:
+            self.graph = self.graph.append(pd.DataFrame([[w, []]]), ignore_index = True)
+            #print(self.graph)
 
     def add_edge(self, edge):
         """ 
             assumes that edge is of type set, tuple or list;
             between two vertices can be multiple edges!
         """
-        edge = set(edge)
-        (w, def_w) = tuple(edge)
+        (w, def_w) = edge
         self.add_vertex(def_w)
-        if w in self.graph.iloc[:,0].values:
-            self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
+        if w in self.graph.iloc[:, 0].values:
+            if def_w not in self.graph[self.graph[0] == w][1].iloc[0]:
+                self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
         else:
             self.add_vertex(w)
             self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
@@ -140,5 +142,4 @@ class graph():
         return res
 
 #ob =  graph(df)
-graph = graph(df2)
-graph = graph.construct_graph()
+graph = graph(df2).construct_graph()
