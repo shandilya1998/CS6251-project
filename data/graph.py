@@ -29,6 +29,8 @@ class graph():
         #self.word = input('input word to evolve dictionary network for: ')
         #self.network = self.evolve_graph(self.word)
         self.graph = pd.DataFrame(columns = [0,1])
+        self.m_graph = pd.DataFrame()
+        self.wordlist = pd.Series()
         
     def combine_polysemous_definitions(self):
         unique_keys = pd.Series(self.data.iloc[:, 0].unique())
@@ -62,6 +64,16 @@ class graph():
                     self.add_edge((w, w_))
         return self.graph
 
+    def construct_adjacency_matrix(self):
+        for w in tqdm(self.data.iloc[:, 0].values):
+            self.m_add_vertex(w)
+            def_w = self.data[self.data[0] == w][1].iloc[0]
+            for df in def_w:
+                df = ast.literal_eval(df)
+                for w_ in df:
+                    self.m_add_edge((w, w_))
+        return self.m_graph
+
     def vertices(self):
         """ 
             returns the vertices of a graph 
@@ -81,10 +93,21 @@ class graph():
             list as a value is added to the dictionary.
             Otherwise nothing has to be done.
         """
-        if w not in self.graph.iloc[:,0].values:
+        if w not in self.graph.iloc[:,0]:    
             self.graph = self.graph.append(pd.DataFrame([[w, []]]), ignore_index = True)
             #print(self.graph)
 
+    def m_add_vertex(self, w):
+        """
+            If the word w is not in self.wordlist, 
+            a key w is added to self.wordlist. This self.wordlist
+            contains the row and column names for the 
+            adjacecny matrix self.m_graph
+        """
+        if w not in self.wordlist:
+            self.wordlist.append(w)
+            self.m_graph = self.m_graph.append(pd.DataFrame([[1]],index = [w], columns = [w]))
+            
     def add_edge(self, edge):
         """ 
             assumes that edge is of type set, tuple or list;
@@ -98,6 +121,21 @@ class graph():
         else:
             self.add_vertex(w)
             self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
+
+    def m_add_edge(self, edge):
+        """
+            edge : tuple
+        """
+        w, def_w = edge
+        self.add_vertex(def_w)
+        if w in self.wordlist:
+            if self.m_graph[w][def_w] == np.nan:
+                self.m_graph[w][def_w] = 1
+            else:
+                self.m_graph[w][def_w]+=1
+        else:
+            self.m_add_vertex(w)
+            self.m_graph[w][def_w] = 1
 
     def __generate_edges(self):
         """ 
@@ -143,3 +181,4 @@ class graph():
 
 #ob =  graph(df)
 graph = graph(df2).construct_graph()
+m_graph = graph(df2).m_construct_graph()
