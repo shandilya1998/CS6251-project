@@ -12,18 +12,17 @@ import copy
 class Data():
     def __init__(self, 
                  random_state = 1, 
-                 path = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/wordlist.csv'):
+                 path = 'wordlist.csv'):
         self.path = path
         self.data = pd.read_csv(self.path, encoding = 'latin1', header = None)
-        #print(self.data.head())
-        #print(self.data.columns)
-        self.data = self.data.iloc[:, 1 :]
-        self.data.columns = np.arange(self.data.shape[1])
+        self.data = self.data.iloc[:,1:3]
+        print(self.data.head())
+        self.data.columns = [0,1]
         self.data.fillna('')
         #print(self.data.head())
-        self.random_state = random_state
-        self.sample = self.data.sample(frac = 0.1, random_state = self.random_state)
-        self.sample = self.sample.set_index(np.arange(len(self.sample)))
+        #self.random_state = random_state
+        #self.sample = self.data.sample(frac = 0.1, random_state = self.random_state)
+        #self.sample = self.sample.set_index(np.arange(len(self.sample)))
                 
     def remove_en_NaN(self):
         self.data = self.data[self.data.iloc[:,0] != 'en'][self.data.iloc[:, 1] != 'en']
@@ -41,7 +40,7 @@ class Data():
     def unique_words_definitions(self):
         """
             This methods returns the unique words in the definitions
-            output - (numpy.ndarray, int)_
+            output - (numpy.ndarray, int)
         """
         keys = np.ndarray((1, 2))
         definitions = self.sample[1].apply(str.split, ' ')
@@ -76,14 +75,8 @@ class Data():
         return definition
 
     def compile_dictionary(self):
-        for i in tqdm(range(1,self.data.shape[1])):
-            self.data.iloc[:,i] = self.logged_apply(self.data.iloc[:,i], self.definition)
-        dictionary = pd.DataFrame(columns = ['word', 'definition'])
-        for i in tqdm(range(len(self.data))):
-            definitions = self.data.iloc[i, 1:]
-            definitions = definitions.dropna().values 
-            dictionary = dictionary.append(pd.DataFrame([[self.data.iloc[i, 0], definitions]], columns = ['word', 'definition']))
-        return dictionary
+        self.data.iloc[:,1] = self.logged_apply(self.data.iloc[:,1], self.definition)
+        return self.data
 
     def logged_apply(self, g, func, *args, **kwargs):
         """
@@ -111,14 +104,14 @@ class Data():
         res = g.apply(logged_func, *args, **kwargs)
         sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
         sys.stdout.flush()
-        return res
+        return resz
 
 data = Data()
 #data.remove_en_NaN()
 #print(data.data.shape)
-unique_words_def_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_def_1.pickle'
-unique_words_keys_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_keys_1.pickle'
-dictionary = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/dictionary.pickle'
+#unique_words_def_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_def_1.pickle'
+#unique_words_keys_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_keys_1.pickle'
+dictionary = 'dictionary.pickle'
 dict_ = data.compile_dictionary()
 pkl = open(dictionary, 'wb')
 pickle.dump(dict_, pkl)

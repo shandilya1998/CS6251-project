@@ -144,17 +144,22 @@ class tests:
         return G
 
     def pagerank(self):
-        self.pagerank = pagerank(self.G)
+        return pagerank(self.G)
 
     def __str__(self):
         return "This is the class of all tests performed on the gaph"
 
-file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/m_graph.pickle'
+file = '../data/m_graph.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
 
 test1 = tests(G)
+pagerank_ =  test1.pagerank()
+file_ = '../data/pagerank.pickle'
+pkl = open(file_, 'wb')
+pickle.dump(pagerank_, pkl)
+pkl.close()
 
 
 

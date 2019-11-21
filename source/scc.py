@@ -34,4 +34,7 @@ class stack():
         return self.append(item)
 
 scc = SCC(G).get_SCC_generator() # G is a pandas adjacecny matrix
-
+file = 'scc.pickle'
+pkl = open(file, 'wb')
+pickle.dump(scc, pkl)
+pkl.close()

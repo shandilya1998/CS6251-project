@@ -14,7 +14,7 @@ path = 'wordlist_tokenized.csv'
 df = pd.read_csv(path)
 df = df.iloc[:, [0,2]]
 # Import combined wordlist
-path = 'combined_wordlist.pickle'
+path = 'dictionary.pickle'
 pkl = open(path, 'rb')
 df2 = pickle.load(pkl)
 pkl.close()
@@ -184,3 +184,7 @@ class graph():
 #ob =  graph(df)
 #graph = graph(df2).construct_graph()
 m_graph = graph(df2).m_construct_graph()
+file = 'm_graph.pickle'
+pkl = open(file, 'wb')
+pickle.dump(m_graph, pkl)
+pkl.close()
