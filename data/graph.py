@@ -7,6 +7,7 @@ import pickle
 #from raw_data import unique_word_keys_file, unique_words_def_file
 import ast
 from tqdm import tqdm
+import numpy as np
    
 
 path = 'wordlist_tokenized.csv'
@@ -30,7 +31,7 @@ class graph():
         #self.network = self.evolve_graph(self.word)
         self.graph = pd.DataFrame(columns = [0,1])
         self.m_graph = pd.DataFrame()
-        self.wordlist = pd.Series()
+        self.wordlist = []
         
     def combine_polysemous_definitions(self):
         unique_keys = pd.Series(self.data.iloc[:, 0].unique())
@@ -64,7 +65,7 @@ class graph():
                     self.add_edge((w, w_))
         return self.graph
 
-    def construct_adjacency_matrix(self):
+    def m_construct_graph(self):
         for w in tqdm(self.data.iloc[:, 0].values):
             self.m_add_vertex(w)
             def_w = self.data[self.data[0] == w][1].iloc[0]
@@ -127,8 +128,9 @@ class graph():
             edge : tuple
         """
         w, def_w = edge
-        self.add_vertex(def_w)
+        self.m_add_vertex(def_w)
         if w in self.wordlist:
+            #print(self.m_graph)
             if self.m_graph[w][def_w] == np.nan:
                 self.m_graph[w][def_w] = 1
             else:
@@ -180,5 +182,5 @@ class graph():
         return res
 
 #ob =  graph(df)
-graph = graph(df2).construct_graph()
+#graph = graph(df2).construct_graph()
 m_graph = graph(df2).m_construct_graph()

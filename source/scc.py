@@ -3,18 +3,25 @@ import numpy as np
 import os
 from tqdm import tqdm
 import pickle
-from data.graph import graph_v1, sample
+#from data.graph import graph_v1, sample
+import networkx as nx
+
+file = '../data/m_graph.pickle'
+pkl = open(file, 'rb')
+G = pickle.load(pkl)
+pkl.close()
 
 class SCC():
     """
         A directed graph is strongly connected if there is a path between all pairs of vertices.
     """
-    def __init__(self, unique_words_path):
-        self.adjacency_list = graph_v1(sample, unique_words_path).construct_adjacency_list()
-        self.stack = stack()
+    def __init__(self, G):
+        self.G = nx.from_pandas_adjacency(G)
 
-    def getTranspose(self):
-        graph = 
+    def get_SCC_generator(self, G = self.G):
+        scc = nx.strongly_connected_component_subgraphs(G, copy=True)
+        return scc
+
 
 class stack():
     def __init__(self):
@@ -25,3 +32,6 @@ class stack():
 
     def push(self, item):
         return self.append(item)
+
+scc = SCC(G).get_SCC_generator() # G is a pandas adjacecny matrix
+

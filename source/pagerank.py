@@ -138,12 +138,13 @@ def pagerank(G, alpha=0.85, personalization=None,
 class tests:
     def __init__(self, G_pandas ):
         self.G = self.to_graph(G_pandas)
-        self.pagerank = pagerank(self.G)
 
     def to_graph(self, G):
         G = nx.from_pandas_adjacency(G, nx.DiGraph)
         return G
 
+    def pagerank(self):
+        self.pagerank = pagerank(self.G)
 
     def __str__(self):
         return "This is the class of all tests performed on the gaph"
@@ -151,9 +152,9 @@ class tests:
 file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/m_graph.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
-pickl.close(pkl)
+pkl.close()
 
-test1 = tests()
+test1 = tests(G)
 
 
 
