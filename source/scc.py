@@ -6,7 +6,7 @@ import pickle
 #from data.graph import graph_v1, sample
 import networkx as nx
 
-file = '../data/m_graph.pickle'
+file = '../data/adjacency_matrix.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
@@ -34,7 +34,7 @@ class stack():
         return self.append(item)
 
 scc = SCC(G).get_SCC_generator() # G is a pandas adjacecny matrix
-file = 'scc.pickle'
+file = '../data/scc.pickle'
 pkl = open(file, 'wb')
 pickle.dump(scc, pkl)
 pkl.close()

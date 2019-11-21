@@ -104,7 +104,7 @@ class Data():
         res = g.apply(logged_func, *args, **kwargs)
         sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
         sys.stdout.flush()
-        return resz
+        return res
 
 data = Data()
 #data.remove_en_NaN()

@@ -10,9 +10,6 @@ from tqdm import tqdm
 import numpy as np
    
 
-path = 'wordlist_tokenized.csv'
-df = pd.read_csv(path)
-df = df.iloc[:, [0,2]]
 # Import combined wordlist
 path = 'dictionary.pickle'
 pkl = open(path, 'rb')
@@ -60,7 +57,6 @@ class graph():
             self.add_vertex(w)
             def_w =  self.data[self.data[0] == w][1].iloc[0]
             for df in def_w:
-                df = ast.literal_eval(df)
                 for w_ in df:
                     self.add_edge((w, w_))
         return self.graph
@@ -70,7 +66,6 @@ class graph():
             self.m_add_vertex(w)
             def_w = self.data[self.data[0] == w][1].iloc[0]
             for df in def_w:
-                df = ast.literal_eval(df)
                 for w_ in df:
                     self.m_add_edge((w, w_))
         return self.m_graph
@@ -183,8 +178,16 @@ class graph():
 
 #ob =  graph(df)
 #graph = graph(df2).construct_graph()
-m_graph = graph(df2).m_construct_graph()
-file = 'm_graph.pickle'
+def func(df2):
+    words = df2.iloc[:,0].unique()
+    df = pd.DataFrame(columns = [0,1])
+    for word in words:
+        def_w = list(df2[df2[0] == word][1].values)
+        df = df.append(pd.DataFrame([[word, def_w]], columns = [0,1]), sort=False)
+    return df
+df2 = func(df2)
+graph = graph(df2).construct_graph()
+file = 'adjacency_list.pickle'
 pkl = open(file, 'wb')
-pickle.dump(m_graph, pkl)
+pickle.dump(graph, pkl)
 pkl.close()
