@@ -4,18 +4,20 @@ import os
 import pickle
 import ast
 
-file = 'adjacency_list.csv'
-df = pd.read_csv(file)
-df = df.iloc[:,1:]
+file = 'adjacency_list.pickle'
+pkl = open(file, 'rb')
+df = pickle.load(pkl)
+pkl.close()
 g = nx.DiGraph()
 def edges_(w):
     print(df[df.iloc[:,0]==w].iloc[:,1].iloc[0])
-    def_w_list = ast.literal_eval(df[df.iloc[:,0] == w].iloc[:,1].iloc[0])
+    def_w_list = df[df.iloc[:,0] == w].iloc[:,1].iloc[0]
     edges = []
     for def_w in def_w_list:
         edges.append((w, def_w))
     g.add_nodes_from([w])
-    g.add_edges_from([def_w])
+    print(edges)
+    g.add_edges_from(edges)
 
 def logged_apply(g, func, *args, **kwargs):
     """
