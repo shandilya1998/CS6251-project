@@ -4,19 +4,25 @@ import os
 import pickle
 import ast
 
-file = 'adjacency_list.pickle'
+file = 'adjacency_list.pickle' 
+#df = pd.read_csv(file)
+#print(df)
+#df = df.iloc[:,1: ]
+#df =df.dropna()
 pkl = open(file, 'rb')
 df = pickle.load(pkl)
 pkl.close()
 g = nx.DiGraph()
+
 def edges_(w):
-    print(df[df.iloc[:,0]==w].iloc[:,1].iloc[0])
+    #print(df[df.iloc[:,0]==w].iloc[:,1].iloc[0])
     def_w_list = df[df.iloc[:,0] == w].iloc[:,1].iloc[0]
     edges = []
     for def_w in def_w_list:
         edges.append((w, def_w))
     g.add_nodes_from([w])
-    print(edges)
+    #print(len(g.nodes))
+    #print(edges)
     g.add_edges_from(edges)
 
 def logged_apply(g, func, *args, **kwargs):
@@ -44,7 +50,7 @@ def logged_apply(g, func, *args, **kwargs):
     sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
     sys.stdout.flush()
     return res
-
+print(len(df.iloc[:,0]))
 logged_apply(df.iloc[:,0], edges_)
 file = 'adjacency_matrix.pickle'
 pkl = open(file, 'wb')
