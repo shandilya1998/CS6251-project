@@ -1,0 +1,47 @@
+<pre>  File &quot;&lt;stdin&gt;&quot;, line 3
+    
+    ^
+IndentationError: expected an indented block
+&gt;&gt;&gt; lst
+[&apos;books&apos;, &apos;dictionary&apos;, &apos;library&apos;, &apos;research&apos;]
+&gt;&gt;&gt; for word in lst:
+...     for u, v in nx.dfs_edges(df2, word):
+... for word in lst:
+  File &quot;&lt;stdin&gt;&quot;, line 3
+    for word in lst:
+    ^
+IndentationError: expected an indented block
+&gt;&gt;&gt; import netoworkx as nx
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+ModuleNotFoundError: No module named &apos;netoworkx&apos;
+&gt;&gt;&gt; import networkx as nx
+&gt;&gt;&gt; G = nx.DiGraph()
+&gt;&gt;&gt; for word in lst:
+...     for u, v in nx.dfs_edges(df2, word):
+...             G.add_edges_from([(u,v)])
+... 
+
+&gt;&gt;&gt; 
+&gt;&gt;&gt; G
+&lt;networkx.classes.digraph.DiGraph object at 0x7f86165e3400&gt;
+&gt;&gt;&gt; G[&apos;dictionary&apos;]
+AtlasView({&apos;list&apos;: {}, &apos;alphabetically&apos;: {}, &apos;reference&apos;: {}, &apos;ordered&apos;: {}})
+&gt;&gt;&gt; len(G.nodes)
+19933
+&gt;&gt;&gt; lst 
+[&apos;books&apos;, &apos;dictionary&apos;, &apos;library&apos;, &apos;research&apos;]
+&gt;&gt;&gt; G[&apos;dictioanary&apos;]
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;/home/shandilya/Shandilya/Padhai/CS6251/Project/venv/lib/python3.7/site-packages/networkx/classes/graph.py&quot;, line 475, in __getitem__
+    return self.adj[n]
+  File &quot;/home/shandilya/Shandilya/Padhai/CS6251/Project/venv/lib/python3.7/site-packages/networkx/classes/coreviews.py&quot;, line 81, in __getitem__
+    return AtlasView(self._atlas[name])
+KeyError: &apos;dictioanary&apos;
+&gt;&gt;&gt; G[&apos;dictionary&apos;]
+AtlasView({&apos;list&apos;: {}, &apos;alphabetically&apos;: {}, &apos;reference&apos;: {}, &apos;ordered&apos;: {}})
+&gt;&gt;&gt; G[&apos;list&apos;]
+AtlasView({&apos;fabric&apos;: {}, &apos;cloth&apos;: {}, &apos;strip&apos;: {}, &apos;cunning&apos;: {}})
+&gt;&gt;&gt; 
+</pre>

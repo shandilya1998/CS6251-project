@@ -4,22 +4,43 @@ import numpy as np
 import os 
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pickle
 
-file = '../data/m_graph.pickle'
+file = '../data/adjacency_matrix.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
 
 class meaning_association():
     def __init__(self, G):
-        self.G
-        self.G_ = nx.from_pandas_adjacency(G)
-        self.m_def = pd.DataFrame()
-        self.wordlist = []
+        self.G = G
+        self.wordlist = list(self.G.nodes)
+        # Comment the next 5 lines if the pickle is made already, uncomment lines 6 to 8 after this
+        self.m_G = self.compute_neighbor_association()
+        file = '../data/graph_meaning_association1.pickle'
+        pkl = open(file, 'wb')
+        pickle.dump(self.m_G, pkl)
+        pkl.close()
+        #pkl = open(file, 'rb')
+        #self.m_g = pickle.load(pkl)
+        #pkl.close()
 
-    def get_meaning_matrix(self, M = self.m_meaning_association):
-        M = self.logged_apply(M.iloc[:,1], self.create_matrix)
-        return return M
+    def set_meaning_association(self, w, def_w, G):
+        """
+            This methods takes the word w, its definition def_w and the networkx graph G
+            Computes the meaning association between two graphs 
+        """
+        # n_simple_paths is the number of simple paths between w and def_w
+        shortest_path_w_def_w = nx.shortest_path_length(G, w, def_w)
+        try: 
+            shortest_path_def_w_w = nx.shortest_path_length(G, def_w, w)
+            try:
+                G[w][def_w]['meaning association'] = float(2/(shortest_path_def_w_w+shortest_path_w_def_w))
+            except ZeroDivisionError:
+                G[w][def_w]['meaning association'] = 1
+        except nx.exception.NetworkXNoPath:
+            G[w][def_w]['meaning association'] = 0
+        return G
 
     #def add_vertex(self, w):
     #    if w not in self.wordlist:
@@ -38,7 +59,38 @@ class meaning_association():
     #def meaning_association(self, w, def_w):
     #    return 1.0
 
-    def create_matrix(self):
+    def compute_neighbor_association(self, G = None):
+        """
+            This method takes a networkx graph as input
+            Computes the meaning association socre for each edge 
+            Returns : networkx graph
+        """
+        if not G:
+            G = self.G
+        for word in tqdm(self.wordlist):
+            for def_w in G[word]:
+                G = self.set_meaning_association(word, def_w, G)
+        return G
+
+    def compute_global_association(self, w1, w2):
+        paths = list(node_disjoint_paths(self.m_G, w1, w2))
+        num = len(paths)
+        val = 0
+        for path in paths:
+            i = 0
+            rel = 1.0
+            while(True):
+                if i == 0:
+                    i+=1
+                    continue
+                elif i == len(path)-1:
+                    break
+                else:
+                    rel = rel*G[path[i-1]][path[i]]
+                    i+=1
+            val+=rel
+        val = val/num
+        return val
 
     def logged_apply(self, g, func, *args, **kwargs):
         """
@@ -69,6 +121,7 @@ class meaning_association():
         return res
 
 
+ob = meaning_association(G)
 
 
     
