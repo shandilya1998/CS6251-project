@@ -13,6 +13,7 @@ pkl.close()
 from spacy.lang.en.stop_words import STOP_WORDS
 nlp = spacy.load('en_core_web_sm')
 import string
+from nltk.corpus import reuters
 
 class query:
     def __init__(self, Q, threshold = 0.3 ):
@@ -26,19 +27,19 @@ class query:
     def create_one_hot_encoded(self):
         q = pd.Series(index = self.V)
         for word in self.bow():
-            q.loc[word] == 1
+            q.loc[word] = 1
         q = q.fillna(0)
         return q
 
     def m_create_encoded(self):
         q = pd.Series(index = self.V)
         for word in self.bow():
-            G_word = self.get_subgraph(word)
+            G_word = self.get_subgraph()
             q = self.populate(G_word)
         q = fillna(0.0)
         return q
 
-    def progressive_widening_search(G, source, value, condition, initial_width=1):
+    def progressive_widening_search(source, value, condition, initial_width=1):
         """Progressive widening beam search to find a node.
 
         The progressive widening beam search involves a repeated beam
@@ -87,11 +88,9 @@ class query:
             # search may visit the same nodes many times (depending on the
             # implementation of the `value` function).
             for u, v in nx.bfs_beam_edges(G_m, source, value, width):
-                
                 self.source = u
                 if self.condition(v):
-                    break
-                    
+                    self.G.add_edges_from([(u,v)])
         # At this point, since all nodes have been visited, we know that
         # none of the nodes satisfied the termination condition.
         raise nx.NodeNotFound("no node satisfied the termination condition")
@@ -107,12 +106,12 @@ class query:
             return True
 
     def dfs(self, visited, node, parent):
-        if node not in visited and G_m[parent][node]['meaning association'] > self.threshold:
+        if node not in visited and G_m[parent][node]['meaning_association'] > self.threshold:
             visited.append(node)
             self.G.add_edges_from([(parent, node)])
-            self.G[parent][node]['meaning association'] = G_m[parent][node]['meaning association']
+            self.G[parent][node]['meaning_association'] = G_m[parent][node]['meaning_association']
             for neighbour in G_m[node]:
-                dfs(visited, neighbour, node)
+                dfs(visited, neighbour, node, score)
 
     def get_sub_graph(self):
         """
@@ -123,6 +122,31 @@ class query:
             self.dfs(self.visited, word, word)
         return self.G
 
+    def populate(self, G):
+        q = pd.Series(index = self.V)
+        for w in G.nodes:
+            score = 0
+            for w_ in self.bow():
+                score_ = 0
+                for path in nx.node_disjoint_path(G, w_, w):
+                    path_len = len(path)
+                    s_ = 1
+                    for i in range(path_len):
+                        if i == 0:
+                            s_ = 1
+                        elif i == path_len-1:
+                            continue
+                        else:
+                            s_ = s_*G[path[i-1]][path[i]]['meaning_association']
+                    score_+=s_/path_len
+                try:
+                    w = 1/nx.shortest_path_length
+                except nx.NetworkXNoPath:
+                    w = 0
+                score+=score_*w
+            q.loc[w]=score
+        q = q.fillna(0)
+        return q
 
     def bow(self):
         self.Q = npl(self.Q)
@@ -135,6 +159,22 @@ class query:
                     continue
                 else:
                     yield token.lemma_
+
+class doc_fetch:
+    def __init__(self, Q, threshold = 0.3):
+        self.Q = Q
+        self.threshold = threshold
+
+    def fetch(self):
+        candidates = []
+        for file in corpus.columns:
+            doc_vec = corpus.loc[:, file]
+            sim = doc_vec.dot(query(self.Q).m_create_encoded())
+            if sim > self.threshold:
+                candidates.append(file)
+        return candidates
+
+
 
  
 
