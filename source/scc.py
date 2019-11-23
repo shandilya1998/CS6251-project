@@ -20,7 +20,7 @@ class SCC():
         self.G = G
 
     def get_SCC_generator(self,):
-        scc = nx.strongly_connected_component_subgraphs(self.G, copy=True)
+        scc = nx.strongly_connected_components(self.G)
         return scc
 
 
