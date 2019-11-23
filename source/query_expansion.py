@@ -15,10 +15,13 @@ nlp = spacy.load('en_core_web_sm')
 import string
 
 class query:
-    def __init__(self, Q ):
+    def __init__(self, Q, threshold = 0.3 ):
         self.Q = Q
         self.V = G_m.nodes
         self.source = ''
+        self.visited = []
+        self.threshold = threshold
+        self.G = nx.DiGraph()
 
     def create_one_hot_encoded(self):
         q = pd.Series(index = self.V)
@@ -34,7 +37,6 @@ class query:
             q = self.populate(G_word)
         q = fillna(0.0)
         return q
-
 
     def progressive_widening_search(G, source, value, condition, initial_width=1):
         """Progressive widening beam search to find a node.
@@ -85,9 +87,11 @@ class query:
             # search may visit the same nodes many times (depending on the
             # implementation of the `value` function).
             for u, v in nx.bfs_beam_edges(G_m, source, value, width):
+                
                 self.source = u
                 if self.condition(v):
                     break
+                    
         # At this point, since all nodes have been visited, we know that
         # none of the nodes satisfied the termination condition.
         raise nx.NodeNotFound("no node satisfied the termination condition")
@@ -97,10 +101,28 @@ class query:
             this method takes the node : str to test for condition as input
             self.source is also a parameter set before calling the method
         """
-        if G_m[self.source][node]['meaning_association'] < 0.3:
+        if G_m[self.source][node]['meaning_association'] < self.threshold:
             return False
         else:
             return True
+
+    def dfs(self, visited, node, parent):
+        if node not in visited and G_m[parent][node]['meaning association'] > self.threshold:
+            visited.append(node)
+            self.G.add_edges_from([(parent, node)])
+            self.G[parent][node]['meaning association'] = G_m[parent][node]['meaning association']
+            for neighbour in G_m[node]:
+                dfs(visited, neighbour, node)
+
+    def get_sub_graph(self):
+        """
+            w_lst : list of words to create a sub-graph using depth-first traversal of
+        """
+        self.G = nx.DiGraph()
+        for word in self.bow()
+            self.dfs(self.visited, word, word)
+        return self.G
+
 
     def bow(self):
         self.Q = npl(self.Q)
