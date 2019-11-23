@@ -136,10 +136,10 @@ def pagerank(G, alpha=0.85, personalization=None,
     raise NetworkXError('pagerank: power iteration failed to converge '
                         'in %d iterations.' % max_iter)
 class tests:
-    def __init__(self, G_pandas ):
-        self.G = self.to_graph(G_pandas)
+    def __init__(self, G):
+        self.G = G
 
-    def to_graph(self, G):
+    def to_graph(self, G_pandas):
         G = nx.from_pandas_adjacency(G, nx.DiGraph)
         return G
 
@@ -149,14 +149,14 @@ class tests:
     def __str__(self):
         return "This is the class of all tests performed on the gaph"
 
-file = '../data/adjacency_matrix.pickle'
+file = 'adjacency_matrix.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
 
 test1 = tests(G)
 pagerank_ =  test1.pagerank()
-file_ = '../data/pagerank.pickle'
+file_ = 'pagerank.pickle'
 pkl = open(file_, 'wb')
 pickle.dump(pagerank_, pkl)
 pkl.close()

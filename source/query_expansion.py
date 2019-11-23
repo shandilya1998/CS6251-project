@@ -1,11 +1,11 @@
 import networx as nx
 import pickle
-file = '../data/corpus.pickle'
+file = 'corpus.pickle'
 pkl = open(file, 'rb')
 corpus = pickle.load(pkl)
 pkl.close()
 
-file = '../data/graph_meaning_associated1.pickle'
+file = 'graph_meaning_associated1.pickle'
 pkl = open(file, 'rb')
 G_m = pickle.load(pkl)
 pkl.close()

@@ -31,11 +31,16 @@ class graph():
         self.wordlist = []
         
     def combine_polysemous_definitions(self):
+        """
+            This method creates a combined wordlist of all words in the dictionary
+            Redundant method
+            Deprecated
+        """
         unique_keys = pd.Series(self.data.iloc[:, 0].unique())
         definitions = self.logged_apply(unique_keys, self.concat_definition)
         self.data = pd.concat([unique_keys, definitions], axis = 1)
         #print(self.data)
-        pkl = 'combined_wordlist.pickle'
+        pkl = '../data/combined_wordlist.pickle'
         pkl = open(pkl, 'wb')
         pickle.dump(self.data, pkl)
         pkl.close()

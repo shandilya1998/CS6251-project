@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pickle
 
-file = '../data/adjacency_matrix.pickle'
+file = 'adjacency_matrix.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
@@ -17,7 +17,7 @@ class meaning_association():
         self.wordlist = list(self.G.nodes)
         # Comment the next 5 lines if the pickle is made already, uncomment lines 6 to 8 after this
         self.m_G = self.compute_neighbor_association()
-        file = '../data/graph_meaning_association1.pickle'
+        file = 'graph_meaning_association1.pickle'
         pkl = open(file, 'wb')
         pickle.dump(self.m_G, pkl)
         pkl.close()
@@ -35,11 +35,11 @@ class meaning_association():
         try: 
             shortest_path_def_w_w = nx.shortest_path_length(G, def_w, w)
             try:
-                G[w][def_w]['meaning association'] = float(2/(shortest_path_def_w_w+shortest_path_w_def_w))
+                G[w][def_w]['meaning_association'] = float(2/(shortest_path_def_w_w+shortest_path_w_def_w))
             except ZeroDivisionError:
-                G[w][def_w]['meaning association'] = 1
+                G[w][def_w]['meaning_association'] = 1
         except nx.exception.NetworkXNoPath:
-            G[w][def_w]['meaning association'] = 0
+            G[w][def_w]['meaning_association'] = 0
         return G
 
     #def add_vertex(self, w):

@@ -15,7 +15,7 @@ class Data():
                  path = 'wordlist.csv'):
         self.path = path
         self.data = pd.read_csv(self.path, encoding = 'latin1', header = None)
-        self.data = self.data.iloc[1:3]
+        self.data = self.data.iloc[:1000,1:3]
         print(self.data.head())
         self.data.columns = [0,1]
         self.data.fillna('')
