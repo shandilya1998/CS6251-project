@@ -117,7 +117,7 @@ def pagerank(G, alpha=0.85, personalization=None,
     dangling_nodes = [n for n in W if W.out_degree(n, weight=weight) == 0.0]
 
     # power iteration: make up to max_iter iterations
-    for _ in range(max_iter):
+    for _ in tqdm(range(max_iter)):
         xlast = x
         x = dict.fromkeys(xlast.keys(), 0)
         danglesum = alpha * sum(xlast[n] for n in dangling_nodes)
@@ -156,6 +156,7 @@ pkl.close()
 
 test1 = tests(G)
 pagerank_ =  test1.pagerank()
+print(len(pagerank_))
 file_ = 'pagerank.pickle'
 pkl = open(file_, 'wb')
 pickle.dump(pagerank_, pkl)
