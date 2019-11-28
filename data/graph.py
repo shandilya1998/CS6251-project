@@ -186,13 +186,16 @@ class graph():
 def func(df2):
     words = df2.iloc[:,0].unique()
     df = pd.DataFrame(columns = [0,1])
-    for word in words:
+    for word in tqdm(words):
         def_w = list(df2[df2[0] == word][1].values)
         if word in df2.iloc[:, 0].unique():
             df
         df = df.append(pd.DataFrame([[word, def_w]], columns = [0,1]), sort=False)
     return df
 df2 = func(df2)
+pkl = open(path, 'wb')
+pickle.dump(df2, pkl)
+pkl.close()
 graph = graph(df2).construct_graph()
 file = 'adjacency_list.pickle'
 pkl = open(file, 'wb')

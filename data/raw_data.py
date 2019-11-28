@@ -23,8 +23,12 @@ class Data():
         #self.random_state = random_state
         #self.sample = self.data.sample(frac = 0.1, random_state = self.random_state)
         #self.sample = self.sample.set_index(np.arange(len(self.sample)))
+        self.wordlist = []
                 
     def remove_en_NaN(self):
+        """
+            Cleans the input dataframe
+        """
         self.data = self.data[self.data.iloc[:,0] != 'en'][self.data.iloc[:, 1] != 'en']
         self.data.to_csv(self.path, header = None, encoding = 'latin1')
 
@@ -59,6 +63,9 @@ class Data():
         return (keys, len(keys))
 
     def definition(self, definition):
+        """
+            Converts a string input definition into a list of lemmatized defining words
+        """
         try:
             np.isnan(definition)
         except TypeError:
@@ -71,16 +78,22 @@ class Data():
                     continue
                 token = token.lemma_
                 tokens.append(token)
+                if token not in self.wordlist:
+                    self.wordlist.append(token)
             definition = copy.deepcopy(tokens)
         return definition
 
     def compile_dictionary(self):
+        """
+            Applies the function definition() on the data 
+            returns transformed data
+        """
         self.data.iloc[:,1] = self.logged_apply(self.data.iloc[:,1], self.definition)
         return self.data
 
     def logged_apply(self, g, func, *args, **kwargs):
         """
-            g - dataframe
+            :x
             func - function to apply to the dataframe
             *args, **kwargs are the arguments to func
             The method applies the function to all the elements of the dataframe and shows progress
@@ -109,16 +122,16 @@ class Data():
 data = Data()
 #data.remove_en_NaN()
 #print(data.data.shape)
-#unique_words_def_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_def_1.pickle'
+unique_words_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/all_words.pickle'
 #unique_words_keys_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_keys_1.pickle'
 dictionary = 'dictionary.pickle'
 dict_ = data.compile_dictionary()
 pkl = open(dictionary, 'wb')
 pickle.dump(dict_, pkl)
 pkl.close()
-#pkl = open(unique_words_def_file, 'wb')
-#pickle.dump(data.unique_words_definitions(), pkl)
-#pkl.close()
+pkl = open(unique_words_file, 'wb')
+pickle.dump(data.wordlist, pkl)
+pkl.close()
 #pkl = open(unique_words_keys, 'wb')
 #pickle.dump(data.unique_word_keys(), pkl)
 #pkl.close()
