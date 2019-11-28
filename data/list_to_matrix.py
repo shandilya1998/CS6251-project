@@ -3,6 +3,8 @@ import networkx as nx
 import os
 import pickle
 import ast
+from raw_data import Data
+from graph import graph, func
 
 file = 'adjacency_list.pickle' 
 #df = pd.read_csv(file)
@@ -12,18 +14,28 @@ file = 'adjacency_list.pickle'
 pkl = open(file, 'rb')
 df = pickle.load(pkl)
 pkl.close()
-g = nx.DiGraph()
+class convert:
+    def __init__(self, path):
+        self.g = nx.DiGraph()
+        self.path = path
+        self.data = Data(path = self.path)  
+        self.dict = Data.comple_dictionary()
+        self.dict = func(self.dict)
+        self.df = graph(self.dict).construct_graph()
+        pkl.close()
+        logged_apply(self.df.iloc[:, 0], self.edges_)
 
-def edges_(w):
-    #print(df[df.iloc[:,0]==w].iloc[:,1].iloc[0])
-    def_w_list = df[df.iloc[:,0] == w].iloc[:,1].iloc[0]
-    edges = []
-    for def_w in def_w_list:
-        edges.append((w, def_w))
-    g.add_nodes_from([w])
-    #print(len(g.nodes))
-    #print(edges)
-    g.add_edges_from(edges)
+
+    def edges_(self, w):
+        #print(df[df.iloc[:,0]==w].iloc[:,1].iloc[0])
+        def_w_list = self.df[self.df.iloc[:, 0] == w].iloc[:, 1].iloc[0]
+        edges = []
+        for def_w in def_w_list:
+            edges.append((w, def_w))
+        self.g.add_nodes_from([w])
+        #print(len(g.nodes))
+        #print(edges)
+        self.g.add_edges_from(edges)
 
 def logged_apply(g, func, *args, **kwargs):
     """
