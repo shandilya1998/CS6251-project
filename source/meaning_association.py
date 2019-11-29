@@ -17,10 +17,10 @@ class meaning_association():
         self.wordlist = list(self.G.nodes)
         # Comment the next 5 lines if the pickle is made already, uncomment lines 6 to 8 after this
         self.m_G = self.compute_neighbor_association()
-        file = 'graph_meaning_association1.pickle'
-        pkl = open(file, 'wb')
-        pickle.dump(self.m_G, pkl)
-        pkl.close()
+        #file = 'graph_meaning_association1.pickle'
+        #pkl = open(file, 'wb')
+        #pickle.dump(self.m_G, pkl)
+        #pkl.close()
         #pkl = open(file, 'rb')
         #self.m_g = pickle.load(pkl)
         #pkl.close()

@@ -4,7 +4,7 @@ import os
 import pickle
 import ast
 from raw_data import Data
-from graph import graph, func
+from graph import graph
 
 file = 'adjacency_list.pickle' 
 #df = pd.read_csv(file)
@@ -16,14 +16,12 @@ df = pickle.load(pkl)
 pkl.close()
 class convert:
     def __init__(self, path):
-        self.g = nx.DiGraph()
         self.path = path
         self.data = Data(path = self.path)  
         self.dict = Data.comple_dictionary()
-        self.dict = func(self.dict)
-        self.df = graph(self.dict).construct_graph()
-        pkl.close()
-        logged_apply(self.df.iloc[:, 0], self.edges_)
+        self.g = graph(self.dict).construct_graph()
+        #pkl.close()
+        #logged_apply(self.df.iloc[:, 0], self.edges_)
 
 
     def edges_(self, w):

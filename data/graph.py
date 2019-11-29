@@ -8,12 +8,17 @@ import pickle
 import ast
 from tqdm import tqdm
 import numpy as np
+import networkx as nx
    
 
 # Import combined wordlist
 path = 'dictionary.pickle'
 pkl = open(path, 'rb')
 df2 = pickle.load(pkl)
+pkl.close()
+f = 'all_words.pickle'
+pkl = open(f, 'rb')
+wordlist = pickle.load(pkl)
 pkl.close()
 class graph():
     def __init__(self, data):
@@ -26,9 +31,15 @@ class graph():
         #self.combine_polysemous_definitions()
         #self.word = input('input word to evolve dictionary network for: ')
         #self.network = self.evolve_graph(self.word)
-        self.graph = pd.DataFrame(columns = [0,1])
-        self.m_graph = pd.DataFrame()
-        self.wordlist = []
+        self.graph = nx.DiGraph()
+        #self.df = pd.DataFrame(columns = [0,1])
+        #self.lst = []
+        #logged_apply(self.data.iloc[:,0], self.func)
+        #pkl = open(path, 'wb')
+        #pickle.dump(df, pkl)
+        #pkl.close()
+        #self.wordlist = []
+        #self.data = self.df
         
     def combine_polysemous_definitions(self):
         """
@@ -37,7 +48,7 @@ class graph():
             Deprecated
         """
         unique_keys = pd.Series(self.data.iloc[:, 0].unique())
-        definitions = self.logged_apply(unique_keys, self.concat_definition)
+        definitions = logged_apply(unique_keys, self.concat_definition)
         self.data = pd.concat([unique_keys, definitions], axis = 1)
         #print(self.data)
         pkl = '../data/combined_wordlist.pickle'
@@ -60,32 +71,17 @@ class graph():
     def construct_graph(self):
         for w in tqdm(self.data.iloc[:, 0].values):
             self.add_vertex(w)
-            def_w =  self.data[self.data[0] == w][1].iloc[0]
+            def_w =  list(self.data[self.data[0] == w][1].values)
             for df in def_w:
                 for w_ in df:
                     self.add_edge((w, w_))
         return self.graph
 
-    def m_construct_graph(self):
-        for w in tqdm(self.data.iloc[:, 0].values):
-            self.m_add_vertex(w)
-            def_w = self.data[self.data[0] == w][1].iloc[0]
-            for df in def_w:
-                for w_ in df:
-                    self.m_add_edge((w, w_))
-        return self.m_graph
-
     def vertices(self):
         """ 
             returns the vertices of a graph 
         """
-        return list(self.graph.iloc[:,0].values)
-
-    def edges(self):
-        """ 
-            returns the edges of a graph 
-        """
-        return self.__generate_edges()
+        return self.graph.nodes
 
     def add_vertex(self, w):
         """ 
@@ -94,20 +90,9 @@ class graph():
             list as a value is added to the dictionary.
             Otherwise nothing has to be done.
         """
-        if w not in self.graph.iloc[:,0]:    
-            self.graph = self.graph.append(pd.DataFrame([[w, []]]), ignore_index = True)
+        if w not in self.graph.nodes:    
+            self.graph.add_nodes_from([w])
             #print(self.graph)
-
-    def m_add_vertex(self, w):
-        """
-            If the word w is not in self.wordlist, 
-            a key w is added to self.wordlist. This self.wordlist
-            contains the row and column names for the 
-            adjacecny matrix self.m_graph
-        """
-        if w not in self.wordlist:
-            self.wordlist.append(w)
-            self.m_graph = self.m_graph.append(pd.DataFrame([[1]],index = [w], columns = [w]))
             
     def add_edge(self, edge):
         """ 
@@ -116,88 +101,52 @@ class graph():
         """
         (w, def_w) = edge
         self.add_vertex(def_w)
-        if w in self.graph.iloc[:, 0].values:
-            if def_w not in self.graph[self.graph[0] == w][1].iloc[0]:
-                self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
+        if w in self.graph.nodes:
+            if def_w not in self.graph.neighbors(w):
+                self.graph.add_edges_from([edge])
         else:
             self.add_vertex(w)
-            self.graph[self.graph[0] == w][1].iloc[0].append(def_w)
+            self.graph.add_edges_from([edge])
 
-    def m_add_edge(self, edge):
-        """
-            edge : tuple
-        """
-        w, def_w = edge
-        self.m_add_vertex(def_w)
-        if w in self.wordlist:
-            #print(self.m_graph)
-            if self.m_graph[w][def_w] == np.nan:
-                self.m_graph[w][def_w] = 1
-            else:
-                self.m_graph[w][def_w]+=1
-        else:
-            self.m_add_vertex(w)
-            self.m_graph[w][def_w] = 1
+    def func(self, word):
+        d = list(df2[df2[0]==word][1].values)
+        if word not in self.lst:
+            self.df = self.df.append(pd.DataFrame([[word, d]], columns = [0,1]), sort = False)
+            self.lst.append(word)
 
-    def __generate_edges(self):
-        """ 
-            A static method generating the edges of the
-            graph "graph". Edges are represented as sets
-            with one (a loop back to the vertex) or two
-            vertices
-        """
-        edges = []
-        for vertex in self.graph.iloc[:,0].values:
-            for neighbour in self.graph[self.graph[0] == vertex][1].iloc[0]:
-                if {neighbour, vertex} not in edges:
-                    edges.append({vertex, neighbour})
-        return edges
-
-    def logged_apply(self, g, func, *args, **kwargs):
-        """
-            g - dataframe
-            func - function to apply to the dataframe
-            *args, **kwargs are the arguments to func
-            The method applies the function to all the elements of the dataframe and shows progress
-        """
-        step_percentage = 100. / len(g)
-        import sys
-        sys.stdout.write('apply progress:   0%')
-        sys.stdout.flush()
-
-        def logging_decorator(func):
-            def wrapper(*args, **kwargs):
-                progress = wrapper.count * step_percentage
-                sys.stdout.write('\033[D \033[D' * 4 + format(progress, '3.0f') + '%')
-                sys.stdout.flush()
-                wrapper.count += 1
-                return func(*args, **kwargs)
-            wrapper.count = 0
-            return wrapper
-
-        logged_func = logging_decorator(func)
-        res = g.apply(logged_func, *args, **kwargs)
-        sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
-        sys.stdout.flush()
-        return res
+def logged_apply(g, func, *args, **kwargs):
+    """
+        g - dataframe
+        func - function to apply to the dataframe
+        *args, **kwargs are the arguments to func
+        The method applies the function to all the elements of the dataframe and shows progress
+    """
+    step_percentage = 100. / len(g)
+    import sys
+    sys.stdout.write('apply progress:   0%')
+    sys.stdout.flush()
+    def logging_decorator(func):
+        def wrapper(*args, **kwargs):
+            progress = wrapper.count * step_percentage
+            sys.stdout.write('\033[D \033[D' * 4 + format(progress, '3.0f') + '%')
+            sys.stdout.flush()
+            wrapper.count += 1
+            return func(*args, **kwargs)
+        wrapper.count = 0
+        return wrapper
+    logged_func = logging_decorator(func)
+    res = g.apply(logged_func, *args, **kwargs)
+    sys.stdout.write('\033[D \033[D' * 4 + format(100., '3.0f') + '%' + '\n')
+    sys.stdout.flush()
+    return res
 
 #ob =  graph(df)
 #graph = graph(df2).construct_graph()
-def func(df2):
-    words = df2.iloc[:,0].unique()
-    df = pd.DataFrame(columns = [0,1])
-    for word in tqdm(words):
-        def_w = list(df2[df2[0] == word][1].values)
-        if word in df2.iloc[:, 0].unique():
-            df
-        df = df.append(pd.DataFrame([[word, def_w]], columns = [0,1]), sort=False)
-    return df
-df2 = func(df2)
-pkl = open(path, 'wb')
-pickle.dump(df2, pkl)
-pkl.close()
+#pkl = open(path, 'wb')
+#pickle.dump(df, pkl)
+#pkl.close()
 graph = graph(df2).construct_graph()
-file = 'adjacency_list.pickle'
+file = 'graph.pickle'
 pkl = open(file, 'wb')
 pickle.dump(graph, pkl)
 pkl.close()
