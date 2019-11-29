@@ -24,7 +24,7 @@ def create_corpus():
         doc = ' '.join(doc)
         doc = nlp(doc)
         for token in doc:
-            if token.text in string.punctuation or token.text == '\'s' or token.text == '':
+            if token.text in string.punctuation or token.text == '\'s' or token.text == '' or token.text == '\'':
                 continue
             try:
                 token = token.lemma_
