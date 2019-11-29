@@ -30,26 +30,21 @@ class test1:
             pickle.dump(m_G, pkl)
             pkl.close()
 
-            #Now we will apply the meaning association tests for 
-
-
-            
-            
+            #Now we will apply the meaning association tests for             
     
     def query(self, q):
         return query(q)
 
 
     def queries(self):
-        for q in['cat licks glass', 'animals lick glass', 'barley rots', 'barley bags', 'diseases caused by water', 'anikal kingdom', 'asbestos mining', 'liquid material display', 'bar fights', 'criminal insane problems', 'happy litle duck', 'aluminium ore']:
-            yield q
+        return ['cat licks glass', 'animals lick glass', 'barley rots', 'barley bags', 'diseases caused by water', 'anikal kingdom', 'asbestos mining', 'liquid material display']
 
     def translation(self):
         """
             This method returns the list of mapping of query word and its translated word in a the test language for every query
             This will be useful when getting results to translation tasks
         """
-        return []
+        return ['gatto leccare il vetro', 'gli animali leccano il vetro', 'marcature di orzo', 'sacchi d\'orzo', 'malattie causate dall\'acqua', 'Regno zonale', 'estrazione dell\'amianto', 'display materiale liquido']
 
     def __str__(self):
         return 'This is test 1'

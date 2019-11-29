@@ -4,7 +4,16 @@ import numpy as np
 import pandas as pd
 import pickle
 from tqdm import tqdm
+import spacy
+from spacy.lang.en.stop_words import STOP_WORDS
+nlp = spacy.load('en_core_web_sm')
+from meaning_association import meaning_association
+from query_expansion import query
 
+file = '../data/all_words.pickle'
+pkl = open(file, 'rb')
+wordlist = pickle.load(pkl)
+pkl.close()
 
 def pagerank(G, alpha=0.85, personalization=None,
              max_iter=100, tol=1.0e-6, nstart=None, weight='weight',
@@ -72,16 +81,17 @@ def pagerank(G, alpha=0.85, personalization=None,
     if len(G) == 0:
         return {}
 
-    if not G.is_directed():
-        D = G.to_directed()
-    else:
-        D = G
+    #if not G.is_directed():
+    #    D = G.to_directed()
+    #else:
+    #    D = G
 
     # Create a copy in (right) stochastic form
-    W = nx.stochastic_graph(D, weight=weight)
+    W = nx.stochastic_graph(G, weight=weight)
     N = W.number_of_nodes()
 
     # Choose fixed starting vector if not given
+    # Initialization of the intial pagerank values
     if nstart is None:
         x = dict.fromkeys(W, 1.0 / N)
     else:
@@ -149,7 +159,7 @@ class tests:
     def __str__(self):
         return "This is the class of all tests performed on the gaph"
 
-file = '../data/graph.pickle'
+file = 'm_graph.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()
@@ -161,6 +171,19 @@ file_ = 'pagerank.pickle'
 pkl = open(file_, 'wb')
 pickle.dump(pagerank_, pkl)
 pkl.close()
+#print('pagerank with personalization with words in query set high and other set low')
+q = 'Programming gives some people joy while others it does not' #test1
+#q = nlp(q)
+#q = [token.lemma_ for token in q if token.lemma_ in wordlist]
+q = query(q)
+# get sub-graph with neighbor meaning association values
+m_q = q.get_sub_graph()
+q_pagerank = pagerank(m_q)
+file = 'q_pagerank-test1.pickle'
+pkl = open(file, 'wb')
+pickle.dump(q_pagerank, pkl)
+pkl.close()
+
 
 
 

@@ -11,7 +11,7 @@ file = '../data/graph.pickle'
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 #print(G.nodes)
-print(G.number_of_nodes())
+#print(G.number_of_nodes())
 pkl.close()
 #file_ = 'm_graph.pickle'
 #pkl = open(file_, 'wb')
@@ -140,12 +140,12 @@ class meaning_association():
         return res
 
 
-ob = meaning_association(G)
-m_g = ob.m_G
-file = 'm_graph.pickle'
-pkl = open(file, 'wb')
-pickle.dump(m_g, pkl)
-pkl.close()
+#ob = meaning_association(G)
+#m_g = ob.m_G
+#file = 'm_graph.pickle'
+#pkl = open(file, 'wb')
+#pickle.dump(m_g, pkl)
+#pkl.close()
 
     
 

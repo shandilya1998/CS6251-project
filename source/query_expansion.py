@@ -1,9 +1,10 @@
-import networx as nx
+import networkx as nx
 import pickle
-file = 'corpus.pickle'
-pkl = open(file, 'rb')
-corpus = pickle.load(pkl)
-pkl.close()
+import spacy
+#file = 'corpus.pickle'
+#pkl = open(file, 'rb')
+#corpus = pickle.load(pkl)
+#pkl.close()
 
 file = 'm_graph.pickle'
 pkl = open(file, 'rb')
@@ -31,13 +32,17 @@ class query:
         q = q.fillna(0)
         return q
 
-    def m_create_encoded(self):
+    def m_create_encoded(self, populate = True):
         q = pd.Series(index = self.V)
         for word in self.bow():
             self.m_G = self.get_subgraph() 
-            q = self.populate(self.m_G)
-        self.q = fillna(0.0)
-        return self.q
+            if populate:
+                q = self.populate(self.m_G)
+        if populate:
+            self.q = fillna(0.0)
+            return self.q
+        else:
+            return self.m_G
 
     def progressive_widening_search(source, value, condition, initial_width=1):
         """Progressive widening beam search to find a node.
@@ -118,7 +123,7 @@ class query:
             w_lst : list of words to create a sub-graph using depth-first traversal of
         """
         self.G = nx.DiGraph()
-        for word in self.bow()
+        for word in self.bow():
             self.dftraversal(self.visited, word, word)
         return self.G
 
