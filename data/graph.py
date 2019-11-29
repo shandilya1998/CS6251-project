@@ -72,9 +72,12 @@ class graph():
         for w in tqdm(self.data.iloc[:, 0].values):
             self.add_vertex(w)
             def_w =  list(self.data[self.data[0] == w][1].values)
-            for df in def_w:
-                for w_ in df:
-                    self.add_edge((w, w_))
+            try:
+                for df in def_w:
+                    for w_ in df:
+                        self.add_edge((w, w_))
+            except TypeError:
+                pass
         return self.graph
 
     def vertices(self):

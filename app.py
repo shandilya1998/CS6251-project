@@ -4,6 +4,7 @@ import os
 import pickle
 from data.list_to_matrix import convert
 from source.meaning_association import meaning_association
+from source.query_expansion import query 
 
 
 class test1:
@@ -19,14 +20,40 @@ class test1:
         return g
 
     def main(self):
-        for f in self.files:
-            data_f = data_(os.path.join(self.p_files, f))
-            data_f.construct_graph()
-            g = data_f.g
-            m_g = meaning_association(g)
+        for Q in self.queries():
+            q = query(Q)
+            m_query = q.m_create_one_hot_encoded()
+            m_G = q.m_G
+            
+            f = 'm_graph'+q+'.pickle'
+            pkl = open(f, 'wb')
+            pickle.dump(m_G, pkl)
+            pkl.close()
+
+            #Now we will apply the meaning association tests for 
+
+
+            
+            
+    
+    def query(self, q):
+        return query(q)
+
 
     def queries(self):
-        return ['cat licks glass', 'animals lick glass', 'barley rots', 'barley bags', '']
+        for q in['cat licks glass', 'animals lick glass', 'barley rots', 'barley bags', 'diseases caused by water', 'anikal kingdom', 'asbestos mining', 'liquid material display', 'bar fights', 'criminal insane problems', 'happy litle duck', 'aluminium ore']:
+            yield q
+
+    def translation(self):
+        """
+            This method returns the list of mapping of query word and its translated word in a the test language for every query
+            This will be useful when getting results to translation tasks
+        """
+        return []
+
+    def __str__(self):
+        return 'This is test 1'
+
         
 
 class data_:

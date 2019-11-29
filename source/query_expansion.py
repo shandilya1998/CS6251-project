@@ -5,7 +5,7 @@ pkl = open(file, 'rb')
 corpus = pickle.load(pkl)
 pkl.close()
 
-file = 'graph_meaning_associated1.pickle'
+file = 'm_graph.pickle'
 pkl = open(file, 'rb')
 G_m = pickle.load(pkl)
 pkl.close()
@@ -34,10 +34,10 @@ class query:
     def m_create_encoded(self):
         q = pd.Series(index = self.V)
         for word in self.bow():
-            G_word = self.get_subgraph()
-            q = self.populate(G_word)
-        q = fillna(0.0)
-        return q
+            self.m_G = self.get_subgraph() 
+            q = self.populate(self.m_G)
+        self.q = fillna(0.0)
+        return self.q
 
     def progressive_widening_search(source, value, condition, initial_width=1):
         """Progressive widening beam search to find a node.
@@ -105,7 +105,7 @@ class query:
         else:
             return True
 
-    def dfs(self, visited, node, parent):
+    def dftraversal(self, visited, node, parent):
         if node not in visited and G_m[parent][node]['meaning_association'] > self.threshold:
             visited.append(node)
             self.G.add_edges_from([(parent, node)])
@@ -119,7 +119,7 @@ class query:
         """
         self.G = nx.DiGraph()
         for word in self.bow()
-            self.dfs(self.visited, word, word)
+            self.dftraversal(self.visited, word, word)
         return self.G
 
     def populate(self, G):
@@ -135,7 +135,7 @@ class query:
                         if i == 0:
                             s_ = 1
                         elif i == path_len-1:
-                            continue
+                            break
                         else:
                             s_ = s_*G[path[i-1]][path[i]]['meaning_association']
                     score_+=s_/path_len
