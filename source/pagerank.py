@@ -159,7 +159,11 @@ class tests:
     def __str__(self):
         return "This is the class of all tests performed on the gaph"
 
+<<<<<<< HEAD
 file = 'm_graph.pickle'
+=======
+file = 'adjacency_matrix.pickle'
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 pkl.close()

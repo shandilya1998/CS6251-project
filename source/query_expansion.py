@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import networkx as nx
 import pickle
 import spacy
@@ -7,6 +8,16 @@ import spacy
 #pkl.close()
 
 file = 'm_graph.pickle'
+=======
+import networx as nx
+import pickle
+file = 'corpus.pickle'
+pkl = open(file, 'rb')
+corpus = pickle.load(pkl)
+pkl.close()
+
+file = 'graph_meaning_associated1.pickle'
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 pkl = open(file, 'rb')
 G_m = pickle.load(pkl)
 pkl.close()
@@ -32,6 +43,7 @@ class query:
         q = q.fillna(0)
         return q
 
+<<<<<<< HEAD
     def m_create_encoded(self, populate = True):
         q = pd.Series(index = self.V)
         for word in self.bow():
@@ -43,6 +55,15 @@ class query:
             return self.q
         else:
             return self.m_G
+=======
+    def m_create_encoded(self):
+        q = pd.Series(index = self.V)
+        for word in self.bow():
+            G_word = self.get_subgraph()
+            q = self.populate(G_word)
+        q = fillna(0.0)
+        return q
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 
     def progressive_widening_search(source, value, condition, initial_width=1):
         """Progressive widening beam search to find a node.
@@ -110,7 +131,11 @@ class query:
         else:
             return True
 
+<<<<<<< HEAD
     def dftraversal(self, visited, node, parent):
+=======
+    def dfs(self, visited, node, parent):
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
         if node not in visited and G_m[parent][node]['meaning_association'] > self.threshold:
             visited.append(node)
             self.G.add_edges_from([(parent, node)])
@@ -123,8 +148,13 @@ class query:
             w_lst : list of words to create a sub-graph using depth-first traversal of
         """
         self.G = nx.DiGraph()
+<<<<<<< HEAD
         for word in self.bow():
             self.dftraversal(self.visited, word, word)
+=======
+        for word in self.bow()
+            self.dfs(self.visited, word, word)
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
         return self.G
 
     def populate(self, G):
@@ -140,7 +170,11 @@ class query:
                         if i == 0:
                             s_ = 1
                         elif i == path_len-1:
+<<<<<<< HEAD
                             break
+=======
+                            continue
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
                         else:
                             s_ = s_*G[path[i-1]][path[i]]['meaning_association']
                     score_+=s_/path_len

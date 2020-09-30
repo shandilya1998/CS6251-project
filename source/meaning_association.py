@@ -5,9 +5,14 @@ import os
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pickle
+<<<<<<< HEAD
 import copy
 
 file = '../data/graph.pickle'
+=======
+
+file = 'adjacency_matrix.pickle'
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 pkl = open(file, 'rb')
 G = pickle.load(pkl)
 #print(G.nodes)
@@ -36,7 +41,10 @@ class meaning_association():
         """
             This methods takes the word w, its definition def_w and the networkx graph G
             Computes the meaning association between two graphs 
+<<<<<<< HEAD
             This is a mutator function
+=======
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
         """
         # n_simple_paths is the number of simple paths between w and def_w
         shortest_path_w_def_w = nx.shortest_path_length(G, w, def_w)
@@ -44,6 +52,7 @@ class meaning_association():
             shortest_path_def_w_w = nx.shortest_path_length(G, def_w, w)
             try:
                 G[w][def_w]['meaning_association'] = float(2/(shortest_path_def_w_w+shortest_path_w_def_w))
+<<<<<<< HEAD
                 #print('v')
             except ZeroDivisionError:
                 G[w][def_w]['meaning_association'] = 1
@@ -57,6 +66,13 @@ class meaning_association():
         return m_G[w][def_w]['meaning_association']
 
 
+=======
+            except ZeroDivisionError:
+                G[w][def_w]['meaning_association'] = 1
+        except nx.exception.NetworkXNoPath:
+            G[w][def_w]['meaning_association'] = 0
+        return G
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 
     #def add_vertex(self, w):
     #    if w not in self.wordlist:
@@ -78,17 +94,26 @@ class meaning_association():
     def compute_neighbor_association(self, G = None):
         """
             This method takes a networkx graph as input
+<<<<<<< HEAD
             Computes the meaning association score for each edge 
+=======
+            Computes the meaning association socre for each edge 
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
             Returns : networkx graph
         """
         if not G:
             G = self.G
         for word in tqdm(self.wordlist):
+<<<<<<< HEAD
             try: 
                 for def_w in G[word]:
                     G = self.set_meaning_association(word, def_w, G)
             except KeyError:
                 pass
+=======
+            for def_w in G[word]:
+                G = self.set_meaning_association(word, def_w, G)
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
         return G
 
     def compute_global_association(self, w1, w2):
@@ -140,12 +165,17 @@ class meaning_association():
         return res
 
 
+<<<<<<< HEAD
 #ob = meaning_association(G)
 #m_g = ob.m_G
 #file = 'm_graph.pickle'
 #pkl = open(file, 'wb')
 #pickle.dump(m_g, pkl)
 #pkl.close()
+=======
+ob = meaning_association(G)
+
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 
     
 

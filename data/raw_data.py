@@ -24,11 +24,7 @@ class Data():
         self.adjacency_lst = {}
                 
     def get_definition(self, definition):
-        """
-            Converts a string input definition into a list of lemmatized defining words
-        """
         if not np.isnan(definition):
-            definition = nlp(definition)
             tokens = set()
             for token in definition:
                 if token.text in string.punctuation or token.text == '\'s' or token.text == '':
@@ -40,7 +36,7 @@ class Data():
                 self.wordlist.add(token)
             return list(tokens)
         return np.nan
-
+    
     def compile_dictionary(self):
         """
             Applies the function definition() on the data 

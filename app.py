@@ -4,7 +4,10 @@ import os
 import pickle
 from data.list_to_matrix import convert
 from source.meaning_association import meaning_association
+<<<<<<< HEAD
 from source.query_expansion import query 
+=======
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
 
 
 class test1:
@@ -20,6 +23,7 @@ class test1:
         return g
 
     def main(self):
+<<<<<<< HEAD
         for Q in self.queries():
             q = query(Q)
             m_query = q.m_create_one_hot_encoded()
@@ -49,6 +53,16 @@ class test1:
     def __str__(self):
         return 'This is test 1'
 
+=======
+        for f in self.files:
+            data_f = data_(os.path.join(self.p_files, f))
+            data_f.construct_graph()
+            g = data_f.g
+            m_g = meaning_association(g)
+
+    def queries(self):
+        return ['cat licks glass', 'animals lick glass', 'barley rots', 'barley bags', '']
+>>>>>>> 2c78ec15aa36a35e398cdc955b1592c255caf017
         
 
 class data_:
