@@ -87,7 +87,7 @@ def pagerank(G, alpha=0.85, personalization=None,
     #    D = G
 
     # Create a copy in (right) stochastic form
-    W = nx.stochastic_graph(G, weight=weight)
+    W = nx.stochastic_graph(G)
     N = W.number_of_nodes()
 
     # Choose fixed starting vector if not given

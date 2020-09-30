@@ -15,82 +15,87 @@ class Data():
                  path = 'wordlist.csv'):
         self.path = path
         self.data = pd.read_csv(self.path, encoding = 'latin1', header = None)
-        self.data = self.data.iloc[:,1:3]
+        self.data = self.data.iloc[:,1:]
         print(self.data.head())
-        self.data.columns = [0,1]
-        self.data.fillna('')
-        #print(self.data.head())
-        #self.random_state = random_state
-        #self.sample = self.data.sample(frac = 0.1, random_state = self.random_state)
-        #self.sample = self.sample.set_index(np.arange(len(self.sample)))
-        self.wordlist = []
+        self.data.columns = [col-1 for col in self.data.columns]
+        self.wordlist = set()
+        self.mapping_wi = {}
+        self.mapping_iw = {}
+        self.adjacency_lst = {}
                 
-    def remove_en_NaN(self):
-        """
-            Cleans the input dataframe
-        """
-        self.data = self.data[self.data.iloc[:,0] != 'en'][self.data.iloc[:, 1] != 'en']
-        self.data.to_csv(self.path, header = None, encoding = 'latin1')
-
-    def unique_word_keys(self):
-        """
-            This function returns all the unique word keys in wiktionary dumps
-            output - (numpy.ndarray, int)
-        """
-        keys = self.sample[0].unique()
-        num_keys = len(keys)
-        return (keys, num_keys) 
-
-    def unique_words_definitions(self):
-        """
-            This methods returns the unique words in the definitions
-            output - (numpy.ndarray, int)
-        """
-        keys = np.ndarray((1, 2))
-        definitions = self.sample[1].apply(str.split, ' ')
-        for i in tqdm(range(0, len(definitions))):
-            W = self.sample.iloc[i, 0]
-            definition = pd.Series(definitions[i]).values
-            for j in range(0, len(definition)):
-                if definition[j] in keys[:,0]:
-                    keys[j, 1]+=1
-                else:
-                    keys = np.append(keys,
-                                          pd.DataFrame([definition[j],
-                                                        0]).iloc[:,
-                                                                 0].values.reshape((1,
-                                                                                    2)), axis = 0)
-        return (keys, len(keys))
-
-    def definition(self, definition):
+    def get_definition(self, definition):
         """
             Converts a string input definition into a list of lemmatized defining words
         """
-        try:
-            np.isnan(definition)
-        except TypeError:
+        if not np.isnan(definition):
             definition = nlp(definition)
-            tokens = []
+            tokens = set()
             for token in definition:
                 if token.text in string.punctuation or token.text == '\'s' or token.text == '':
                     continue
                 if token.is_stop:
                     continue
                 token = token.lemma_
-                tokens.append(token)
-                if token not in self.wordlist:
-                    self.wordlist.append(token)
-            definition = copy.deepcopy(tokens)
-        return definition
+                tokens.add(token)
+                self.wordlist.add(token)
+            return list(tokens)
+        return np.nan
 
     def compile_dictionary(self):
         """
             Applies the function definition() on the data 
             returns transformed data
         """
-        self.data.iloc[:,1] = self.logged_apply(self.data.iloc[:,1], self.definition)
-        return self.data
+        for i in self.data.columns:
+            if(i != 0):
+                self.data.iloc[:,i] = self.logged_apply(
+                    self.data.iloc[:,i], 
+                    self.get_definition
+                )
+        self.wordlist = list(self.wordlist)
 
+    def get_processed_data(self):
+        self.compile_dictionary()
+        
+        if os.path.exists('dictonary.pickle'):
+            os.remove('dictionary.pickle')
+        pkl = open('dictionary.pickle', 'wb')
+        pickle.dump(self.data)
+        pkl.close()
+        
+        for i in range(len(self.wordlist)):
+            self.mapping_wi[self.wordlist[i]] = i
+            self.mapping_iw[i] = self.wordlist[i]
+
+        if os.path.exists('wordlist.pickle'):
+            os.remove('wordlist.pickle')
+        pkl = open('wordlist.pickle', 'wb')
+        pickle.dump(self.mapping_wi)
+        pkl.close()
+
+        if os.path.exists('index2word.pickle'):
+            os.remove('index2word.pickle')
+        pkl = open('index2word.pickle', 'wb')
+        pickle.dump(pkl)
+        pkl.close()
+
+        for index, row in self.data.iterrows():
+            lst = set()
+            try:
+                lst = set(self.adjacency_lst[self.mapping_wi[self.data[index, 0]]])
+            except KeyError:
+                pass
+            for i in self.data.columns:
+                if i!=0:
+                    for j in range(self.data[index, i]):
+                        lst.add(self.mapping_wi[self.data[index, i][j]])
+            self.adjacency_lst[self.mapping_wi[self.data[index, 0]]] = list(lst)
+        if os.path.exists('adjacency_list.pickle'):
+            os.remove('adjacency_list.pickle')
+        pkl = open('adjacency_list.pickle', 'wb')
+        pickle.dump(self.adjacency_lst)
+        pkl.close()
+            
     def logged_apply(self, g, func, *args, **kwargs):
         """
             :x
@@ -120,20 +125,4 @@ class Data():
         return res
 
 data = Data()
-#data.remove_en_NaN()
-#print(data.data.shape)
-unique_words_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/all_words.pickle'
-#unique_words_keys_file = '/home/shandilya/Shandilya/Padhai/CS6251/Project/data/unique_words_keys_1.pickle'
-dictionary = 'dictionary.pickle'
-dict_ = data.compile_dictionary()
-pkl = open(dictionary, 'wb')
-pickle.dump(dict_, pkl)
-pkl.close()
-pkl = open(unique_words_file, 'wb')
-pickle.dump(data.wordlist, pkl)
-pkl.close()
-#pkl = open(unique_words_keys, 'wb')
-#pickle.dump(data.unique_word_keys(), pkl)
-#pkl.close()
-   
-
+data.get_processed_data()

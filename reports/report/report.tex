@@ -1,0 +1,168 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\begin{document}
+%
+\title{Extracting meaning from Dictionaries}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Shreyas Shandilya \and
+Krishna Raj}
+%
+\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{IIT Madras, Chennai TN 600036, India }
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+This work investigates the possible applications of dictionaries as a source of lexical knowledge. We have taken a graph theoretic approach to model the knowledge present in a dictionary as a Dictionary Network. To demonstrate possible applications of this network in NLP tasks we have devised an algorithms to retrieve documents related to a query. Using the hypothesis that meaning is a network property, the designed algorithm retrieves documents based on the relevance of the query to the document according to a meaning association measure that was formulated to take into account how meaning flows in the dictionary network. This paper also investigates the importance of words in a lexicon using pagerank algorithm. 
+
+\keywords{Dictionary Networks, Document Retrieval, Graphs, Depth First Traversal, Meaning Association}
+\end{abstract}
+%
+%
+%
+\section{Introduction}
+A Dictionary is defined as a book or electronic resource that lists the words of a language (typically in alphabetical order) and gives their meaning, or gives the equivalent words in a different language, often also providing information about pronunciation, origin, and usage. The most prominent information that dictionaries contain are the word meaning relationships between words. A word is a linguistic representation of a concept in a language. All concepts in a language is the set of abstract objects that the language can be used to describe. Words are the representations that are used alone or together in a sentence to describe a concept or a number of concepts. Multiple words can be used to define a single concept (synonymy) and the same word can be used to define multiple concepts (polysymy). Words when combined together in phrases or sentences can be used to represent more complex concepts, formed by a combination of multiple. 
+\paragraph{}
+Humans use a mental representation of the concept they know to generate language. A mental lexicon is used to find the most appropriate word/phrase that can represent the concept in question. The detailed process of how the manipulation and the retrieval of the appropriate words occur is not the topic of discussion of this paper. This idea of mental representations and lexicon can be extended to dictionaries, using concepts and words as their description. Concepts can be viewed as the mental representations that can be manipulated to create new concepts and the words in the dictionary form the lexicon to describe the concepts. This paper makes use of how a dictionary defines a word using other words and the idea of concepts and their representative words to investigate the use of dictionaries as a source of structured lexical information to perform NLP tasks. The application this paper focuses on is document retrieval using the meaning association between words.
+\subsection{Concepts and Words}
+Let C=\{c$_{1}$, c$_{2}$, c$_{3}$,.....,c$_{n}$\} be the set of concepts described by the words in a dictionary D and W = \{w$_{1}$, w$_{2}$, w$_{3}$,...., w$_{n}$\} be the set of all words in D. The '*' operation combines two concepts to output a new more complex concept:
+\begin{equation}
+     c_{k} = c_{1}*c_{2}
+\end{equation}
+If words are being used to represent concepts in a language, a combination of words according to the aforementioned formulation will give a new concept:
+\begin{equation}
+    c_{k} = w_{1}*w_{2} 
+\end{equation}
+\begin{equation}
+    w_{1}*w_{2} = c_{1}*c_{2}
+\end{equation}
+where w$_{1}$ describes c$_{1}$ and w$_{2}$ describes c$_{2}$.
+\paragraph{}
+Thus, words manipulation of words can be performed to get the same concept as obtained by the combination of the concepts being represented by the two words. Thus, it can be concluded that, 
+\begin{equation}
+    w_{k} = w_{1}*w_{2}
+\end{equation}
+Since concepts in a language are not explicitly available, manipulations can be performed on words to get new concepts. Dictionaries defined  words using other words in a language. Each word in a language is used to described a concept. Thus, it can be said that '*' operation between two words will define a new word and this new word will then represent a concept formed by the combination of the concepts described by the words in the definition of the concerned word. This paper investigates the viability of application of this hypothesis in designing systems that can understand the meaning of words and understand meaning of sentences and phrases.
+\section{Prior Work}
+Dictionaries can be parsed to organize the knowledge with functions like Hypernym, Relation, Qualifier etc\cite{dict_use}. K.C. Litkowski (1978) was one of the first to state the importance of studying and exploiting dictionary networks, both as sources of material for natural language and to unravel the complexities of meaning. He presented three models to represent a dictionary. The first model uses nodes to represent words and edges to represent the relation w{\scriptsize a} “is used to define” w{\scriptsize b} . The second model extends the first one, adding relations between words and senses. In the third model, nodes represent concepts and edges represent different relations between them (senses, part of sentence, etc). Such models can be used a lexical resources, which can then be used to learn sementic relations, meaning association and language rules.
+\section{Methodology}
+\subsection{Dictionary Networks}
+The purpose of dictionaries, writes Wilks et al. (1993), “is to provide definitions of senses of words and, in so doing, supply knowledge about not just language, but the world.” The definition of a word involves recursively new words, and thus, new senses and meanings. In this way, a dictionary can naturally be viewed as a network where each word w is related to the set of words w{\scriptsize 1} , . . . , w{\scriptsize n} that define it: for each word w so defined, consider the relationship w \textrightarrow  w{\scriptsize i} for each i = 1, . . . , n, and proceed recursively with all the entries of the dictionary.\linebreak
+These Dictionary Networks with proper modifications can be exploited for the purpose of word sense disambiguation, information retrieval, etc. In this paper we present a dictionary network extracted from Wiktionary. 
+\subsection{Network Construction}
+A graph G is defined by G = (V, E) where V is a set of n vertices and E is a set  E $\subset$ V$^{2}$   of m edges. V is the set of words and E is defined by a relation E $\xrightarrow{R}$ E : (w$_{1}$ , w$_{2}$ )  E if and only if w $\xrightarrow{R}$ w$_{2}$. An adjacency matrix A$_{m}$ and an adjacency list A$_{l}$ store the graph. Another vector W = \{w$_{1}$,w$_{2}$,..., w$_{n}$\}. Each vertex i in the network will have a set of attributes Attr = {attr$_{1}$, attr$_{2}$,....., attr$_{k}$}. These attributes will be used to define the relationship R between two vertices
+
+
+\subsubsection{Sample Heading (Third Level)} Only two levels of
+headings should be numbered. Lower level headings remain unnumbered;
+they are formatted as run-in headings.
+
+\paragraph{Sample Heading (Fourth Level)}
+The contribution should contain no more than four levels of
+headings. Table~\ref{tab1} gives a summary of all heading levels.
+
+\begin{table}
+\caption{Table captions should be placed above the
+tables.}\label{tab1}
+\begin{tabular}{|l|l|l|}
+\hline
+Heading level &  Example & Font size and style\\
+\hline
+Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
+1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
+2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
+3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
+4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\noindent Displayed equations are centered and set on a separate
+line.
+\begin{equation}
+x + y = z
+\end{equation}
+Please try to avoid rasterized images for line-art diagrams and
+schemas. Whenever possible, use vector graphics instead (see
+Fig.~\ref{fig1}).
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig1.eps}
+\caption{A figure caption is always placed below the illustration.
+Please note that short captions are centered, while long ones are
+justified by the macro package automatically.} \label{fig1}
+\end{figure}
+
+\begin{theorem}
+This is a sample theorem. The run-in heading is set in bold, while
+the following text appears in italics. Definitions, lemmas,
+propositions, and corollaries are styled the same way.
+\end{theorem}
+%
+% the environments 'definition', 'lemma', 'proposition', 'corollary',
+% 'remark', and 'example' are defined in the LLNCS documentclass as well.
+%
+\begin{proof}
+Proofs, examples, and remarks have the initial word in italics,
+while the following text appears in normal font.
+\end{proof}
+For citations of references, we prefer the use of square brackets
+and consecutive numbers. Citations using labels or the author/year
+convention are also acceptable. The following bibliography provides
+a sample reference list with entries for journal
+articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
+book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
+and a homepage~\cite{ref_url1}. Multiple citations are grouped
+\cite{ref_article1,ref_lncs1,ref_book1},
+\cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
+%
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+% \bibliographystyle{splncs04}
+% \bibliography{mybibliography}
+%
+\begin{thebibliography}{8}
+\bibitem{ref_article1}
+Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
+
+\bibitem{ref_lncs1}
+Author, F., Author, S.: Title of a proceedings paper. In: Editor,
+F., Editor, S. (eds.) CONFERENCE 2016, LNCS, vol. 9999, pp. 1--13.
+Springer, Heidelberg (2016). \doi{10.10007/1234567890}
+
+\bibitem{ref_book1}
+Author, F., Author, S., Author, T.: Book title. 2nd edn. Publisher,
+Location (1999)
+
+\bibitem{ref_proc1}
+Author, A.-B.: Contribution title. In: 9th International Proceedings
+on Proceedings, pp. 1--2. Publisher, Location (2010)
+
+\bibitem{ref_url1}
+LNCS Homepage, \url{http://www.springer.com/lncs}. Last accessed 4
+Oct 2017
+\end{thebibliography}
+\end{document}
