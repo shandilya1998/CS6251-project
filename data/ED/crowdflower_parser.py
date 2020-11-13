@@ -12,59 +12,70 @@ nlp = spacy.load('en_core_web_sm')
 from wordsegment import load, segment
 load()
 
-from hunspell import Hunspell
-h = Hunspell()
+from autocorrect import Speller
+spell = Speller()
 
+import preprocessor as p
 
-
-def expand_contractions(text, contraction_mapping=CONTRACTION_MAP_a):
-
-    contractions_pattern = re.compile('({})'.format('|'.join(contraction_mapping.keys())),
-                                      flags=re.IGNORECASE|re.DOTALL)
-    def expand_match(contraction):
-        match = contraction.group(0)
-        first_char = match[0]
-        expanded_contraction = contraction_mapping.get(match)\
-                                if contraction_mapping.get(match)\
-                                else contraction_mapping.get(match.lower())
-        expanded_contraction = first_char+expanded_contraction[1:]
-        return expanded_contraction
-
-    expanded_text = contractions_pattern.sub(expand_match, text)
-    expanded_text = re.sub("'", "", expanded_text)
-    return expanded_text
-
+from pycontractions import Contractions
+cont = Contractions(api_key="glove-twitter-100")
+cont.load_models()
 
 df = pd.read_csv('text_emotion_crowdflower.csv')
 
 print(df.head(5))
 
+p.set_options(p.OPT.URL, p.OPT.EMOJI, p.OPT.MENTION, p.OPT.HASHTAG)
+
 def parse(tweet):
-    tweet = re.sub(r'https?:\/\/(www\.)?[-a-zA-Z0–9@:%._\+=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0–9@:%_\+.?&//=]*)', '', tweet, flags=re.MULTILINE)
-    
-    tweet = re.sub(r'[-a-zA-Z0–9@:%._\+=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0–9@:%_\+.?&//=]*)', '', tweet, flags=re.MULTILINE) # to remove other url links
-    
-    tweet = ''.join(re.sub("(@[A-Za-z0–9]+)|([0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",tweet).split())
-    
-    tweet = ' '.join(segment(tweet)) 
-    tweet = nlp(expand_contractions(tweet))
+    #print('original:')
+    #print(tweet)
+    tweet = p.clean(tweet)
+    #print('tweet preprocessing:')
+    #print(tweet)
+    tweet =  list(cont.expand_texts([tweet], precise=True))[0]
+    #print('contractions expanded:')
+    #print(tweet)
     sent = []
+    tweet = nlp(tweet)
     for word in tweet:
         if word.text in string.punctuation or word.text == '\'s' or word.text == '' or word.text == '\'':
             continue
         else:
-            sent.append(word.text.lower())
-    tweet = []
-    for word in sent:
-        if not h.spell(word):
-            try:
-                word = h.suggest(word)[0]
-            except:
-                pass
-        tweet.append(word)
-    tweet = ' '.join(tweet)
-    print(tweet)
+            sent.append(spell(word.text))
+    tweet = ' '.join(sent)
+    #print('spell check:')
+    #print(tweet)
     return tweet
 
-df['parsed tweets'] = df['content'].apply(parse)
+def logged_apply(g, func, *args, **kwargs):
+    """
+        func - function to apply to the dataframe
+        *args, **kwargs are the arguments to func
+        The method applies the function to all the elements of the dataframe and shows progress
+    """
+    step_percentage = 100. / len(g)
+    import sys
+    print('\rApply progress:   0%', end = "")
+    sys.stdout.flush()
+
+    def logging_decorator(func):
+        def wrapper(*args, **kwargs):
+            progress = wrapper.count * step_percentage
+            #sys.stdout.write('\033[D \033[D' * 4 + format(progress, '3.0f') + '%')
+            print('\rApply progress:   {prog}%'.format(prog=progress), end = "")
+            sys.stdout.flush()
+            wrapper.count += 1
+            return func(*args, **kwargs)
+        wrapper.count = 0
+        return wrapper
+
+    logged_func = logging_decorator(func)
+    res = g.apply(logged_func, *args, **kwargs)
+    print('\rApply progress:   1 00%', end = "")
+    sys.stdout.flush()
+    print('\n')
+    return res
+
+df['parsed tweets'] = logged_apply(df['content'], parse)
 df.to_csv('parsed_crowdflower_dataset.csv')
