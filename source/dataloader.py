@@ -14,6 +14,8 @@ class DataLoader(tf.keras.utils.Sequence):
     def __init__(
         self, 
         batch_size,
+        train,
+        train_test_split,
         dictionary_encoding = True 
         num_neighbours = 5, 
         data = ED_DATA, 
@@ -24,6 +26,10 @@ class DataLoader(tf.keras.utils.Sequence):
     ):
         self.batch_size = batch_size
         self.data = pd.read_csv(data)
+        if train:
+            self.data=self.data.iloc[:math.floor(train_test_split*len(self.data))]
+        else:
+            self.data=self.data.iloc[math.floor(train_test_split*len(self.data)):]
         self.nn = num_neighbours
         self.g = pickle.load(open(adj, 'rb'))
         self.wordlist = pickle.load(open(wordlist, 'rb'))
