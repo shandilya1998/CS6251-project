@@ -8,4 +8,10 @@ The following are the labels for emotions used in the combined dataset.
 - sadness : 5
 - surprise : 6
 - shame : 7
--
+- enthusiasm : 8
+- worry : 9
+- love : 10
+- fun : 11
+- hate : 12
+- boredom : 13
+- relief : 14
