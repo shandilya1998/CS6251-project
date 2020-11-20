@@ -2,8 +2,25 @@ from models import *
 from constants import *
 import tensorflow as tf
 from dataloader import DataLoader
- 
+from tqdm import tqdm
+
 def train():
+    sent_enc_dense_units = 50
+    sent_enc_layer1_units = 50
+    sent_enc_layer2_units = 100
+    pos_enc_dense_units = 40
+    pos_enc_layer1_units = 50
+    cl_layer1_units = 35
+    model = get_model(
+        sent_enc_dense_units,
+        sent_enc_layer1_units,
+        sent_enc_layer2_units,
+        pos_enc_dense_units,
+        pos_enc_layer1_units,
+        cl_layer1_units,
+    ) 
+    print(model.summary())
+    
     dataloader_train = DataLoader(
         batch_size = BATCH_SIZE,
         train = True,
@@ -47,10 +64,10 @@ def train():
         test_loss(loss)
         test_accuracy(y, out)
 
-    train_loss = []
-    test_loss = []
-    train_accuracy = []
-    test_accuracy = []
+    train_loss_history = []
+    test_loss_history = []
+    train_accuracy_history = []
+    test_accuracy_history = []
     
     for epoch in range(NUM_EPOCHS):
         # Reset the metrics at the start of the next epoch
@@ -59,16 +76,16 @@ def train():
         test_loss.reset_states()
         test_accuracy.reset_states()
 
-        for x, y in dataloader_train:
+        for x, y in tqdm(dataloader_train):
             train_step(x[0], x[1], y)
 
         for x, y in dataloader_test:
             test_step(x[0], x[1], y)
 
-        train_loss.append(train_loss.result())
-        test_loss.append(test_loss.resut())
-        train_accuracy.append(train_accuracy.result()*100)
-        test_accuracy.append(test_accuracy.result()*100)
+        train_loss_history.append(train_loss.result())
+        test_loss_history.append(test_loss.resut())
+        train_accuracy_history.append(train_accuracy.result()*100)
+        test_accuracy_history.append(test_accuracy.result()*100)
 
         print(
             f'Epoch {epoch + 1}, '
@@ -77,3 +94,18 @@ def train():
             f'Test Loss: {test_loss.result()}, '
             f'Test Accuracy: {test_accuracy.result() * 100}'
         )
+    return train_loss_history, test_loss_history, train_accuracy_history, test_accuracy_history
+        
+train_loss_history, test_loss_history, train_accuracy_history, test_accuracy_history = train() 
+pkl = open('out/train_loss_history.pickle', 'wb')
+pickle.dump(train_loss_history, pkl)
+pkl.close()
+pkl = open('out/test_loss_history.pickle', 'wb')
+pickle.dump(test_loss_history, pkl)
+pkl.close()
+pkl = open('out/train_accuracy_history.pickle', 'wb')
+pickle.dump(train_accuracy_history, pkl)
+pkl.close()
+pkl = open('out/test_accuracy_history.pickle', 'wb')
+pickle.dump(test_accuracy_history, pkl)
+pkl.close()
