@@ -11,6 +11,13 @@ def train():
     pos_enc_dense_units = 40
     pos_enc_layer1_units = 50
     cl_layer1_units = 35
+
+    dataloader = Dataloader(
+        batch_size = BATCH_SIZE,
+        train = True,
+        train_test_split = 0.9
+    )
+
     model = get_model(
         sent_enc_dense_units,
         sent_enc_layer1_units,
@@ -18,20 +25,9 @@ def train():
         pos_enc_dense_units,
         pos_enc_layer1_units,
         cl_layer1_units,
+        num_words = dataloader.generator.num_words
     ) 
     print(model.summary())
-    
-    dataloader_train = DataLoader(
-        batch_size = BATCH_SIZE,
-        train = True,
-        train_test_split = 0.9
-    )
-
-    dataloader_test = DataLoader(
-        batch_size = BATCH_SIZE,
-        train = False,
-        train_test_split = 0.9
-    )
 
     train_loss = tf.keras.metrics.Mean(name='train_loss')
     train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
@@ -76,11 +72,15 @@ def train():
         test_loss.reset_states()
         test_accuracy.reset_states()
 
-        for x, y in tqdm(dataloader_train):
+        for x, y in tqdm(dataloader.generator):
             train_step(x[0], x[1], y)
 
-        for x, y in dataloader_test:
+        dataloader.toggle(train = False)
+
+        for x, y in dataloader.generator:
             test_step(x[0], x[1], y)
+
+        dataloader.toggle(train = True)
 
         train_loss_history.append(train_loss.result())
         test_loss_history.append(test_loss.resut())
@@ -96,6 +96,8 @@ def train():
         )
     return train_loss_history, test_loss_history, train_accuracy_history, test_accuracy_history
         
+train_loss_history, test_loss_history, train_accuracy_history, test_accuracy_history = train()
+     
 train_loss_history, test_loss_history, train_accuracy_history, test_accuracy_history = train() 
 pkl = open('out/train_loss_history.pickle', 'wb')
 pickle.dump(train_loss_history, pkl)
