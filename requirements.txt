@@ -31,7 +31,7 @@ pyparsing==2.4.2
 pytest==5.2.2
 python-dateutil==2.8.0
 pytz==2019.3
-PyYAML==5.1.2
+PyYAML==5.4
 ray==0.7.3
 redis==3.3.11
 regex==2019.11.1
@@ -85,7 +85,7 @@ pyparsing==2.4.2
 pytest==5.2.2
 python-dateutil==2.8.0
 pytz==2019.3
-PyYAML==5.1.2
+PyYAML==5.4
 ray==0.7.3
 redis==3.3.11
 regex==2019.11.1
@@ -160,7 +160,7 @@ pyparsing==2.4.2
 pytest==5.2.2
 python-dateutil==2.8.0
 pytz==2019.3
-PyYAML==5.1.2
+PyYAML==5.4
 ray==0.7.3
 redis==3.3.11
 regex==2019.11.1
@@ -250,7 +250,7 @@ pyparsing==2.4.2
 pytest==5.2.2
 python-dateutil==2.8.0
 pytz==2019.3
-PyYAML==5.1.2
+PyYAML==5.4
 ray==0.7.3
 redis==3.3.11
 regex==2019.11.1
