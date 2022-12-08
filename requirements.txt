@@ -1,7 +1,7 @@
 atomicwrites==1.3.0
 attrs==19.3.0
 blis==0.4.1
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 colorama==0.4.1
@@ -52,7 +52,7 @@ attrs==19.3.0
 blis==0.4.1
 boto3==1.15.11
 botocore==1.18.11
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 colorama==0.4.1
@@ -114,7 +114,7 @@ blis==0.4.1
 boto3==1.15.11
 botocore==1.18.11
 cachetools==4.1.1
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 colorama==0.4.1
@@ -201,7 +201,7 @@ boto3==1.15.11
 botocore==1.18.11
 CacheMan==2.1.0
 cachetools==4.1.1
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 colorama==0.4.1
